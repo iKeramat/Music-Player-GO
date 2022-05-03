@@ -340,7 +340,6 @@ class DetailsFragment : Fragment(), SearchView.OnQueryTextListener {
 
             setHasFixedSize(true)
             adapter = SongsAdapter()
-            FastScrollerBuilder(this).useMd2Style().build()
 
             ItemTouchHelper(ItemSwipeCallback(requireContext(), isQueueDialog = false, isFavoritesDialog = false) { viewHolder: RecyclerView.ViewHolder,
                                                                           direction: Int ->
@@ -370,6 +369,7 @@ class DetailsFragment : Fragment(), SearchView.OnQueryTextListener {
                     }
                 }
             }
+            FastScrollerBuilder(_detailsFragmentBinding?.songsRv!!).useMd2Style().build()
         }
     }
 
