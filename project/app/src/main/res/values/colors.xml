@@ -26,4 +26,6 @@
     <color name="mainBg">#fcfcfc</color>
     <color name="systemBarBg">@android:color/transparent</color>
     <color name="toolbarBg">@color/mainBg</color>
+
+    <color name="ic_launcher_background">#ff8e44ad</color>
 </resources>
