@@ -1,38 +1,27 @@
 package com.iven.musicplayergo.preferences
 
-import android.app.Activity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.iven.musicplayergo.GoPreferences
-import com.iven.musicplayergo.R
+import com.iven.musicplayergo.databinding.FilterItemBinding
 import com.iven.musicplayergo.utils.Theming
 
 
-class FiltersAdapter(val activity: Activity) :
-    RecyclerView.Adapter<FiltersAdapter.CheckableItemsHolder>() {
+class FiltersAdapter: RecyclerView.Adapter<FiltersAdapter.CheckableItemsHolder>() {
 
     private val mItemsToRemove = mutableListOf<String>()
 
     private val mAvailableItems = GoPreferences.getPrefsInstance().filters?.sorted()?.toMutableList()
 
-    private val mDisabledColor = Theming.resolveWidgetsColorNormal(activity)
-
-    private val mDefaultTextColor = Theming.resolveColorAttr(activity, android.R.attr.textColorPrimary)
-
     fun getUpdatedItems() = mAvailableItems?.apply {
         removeAll(mItemsToRemove.toSet())
     }?.toSet()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CheckableItemsHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.filter_item,
-            parent,
-            false
-        )
-    )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheckableItemsHolder {
+        val binding = FilterItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CheckableItemsHolder(binding)
+    }
 
     override fun getItemCount() = mAvailableItems?.size!!
 
@@ -40,19 +29,29 @@ class FiltersAdapter(val activity: Activity) :
         holder.bindItems(mAvailableItems?.get(position))
     }
 
-    inner class CheckableItemsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CheckableItemsHolder(private val binding: FilterItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bindItems(itemFilter: String?) {
 
-            with(itemView as MaterialCheckBox) {
-                text = itemFilter
-                setOnCheckedChangeListener { _, b ->
-                    if (b) {
-                        setTextColor(mDefaultTextColor)
-                        mItemsToRemove.remove(itemFilter)
-                    } else {
-                        setTextColor(mDisabledColor)
-                        mItemsToRemove.add(itemFilter!!)
+            with(binding) {
+
+                val context = binding.root.context
+
+                itemFilter?.let { itemFiltered ->
+
+                    title.text = itemFiltered
+                    filter.setOnCheckedChangeListener { _, b ->
+                        if (b) {
+                            title.setTextColor(Theming.resolveColorAttr(context, android.R.attr.textColorPrimary))
+                            mItemsToRemove.remove(itemFiltered)
+                        } else {
+                            title.setTextColor(Theming.resolveWidgetsColorNormal(context))
+                            mItemsToRemove.add(itemFiltered)
+                        }
+                    }
+
+                    root.setOnClickListener {
+                        filter.isChecked = !filter.isChecked
                     }
                 }
             }

@@ -29,10 +29,11 @@
     <string name="error_no_music">先に曲を追加してください。</string>
     <string name="error_not_ready">音楽ライブラリの読み込み中に問題が発生しました。 SDカードのマウントが解除され、Androidメディアストレージのデータベースを再構築している可能性があります。後でもう一度お試しください。</string>
     <string name="error_unknown_unsupported">問題が発生しました。選択した形式がサポートされていないか、フォルダにアクセスできません（アプリのせいではありません）。</string>
-    <string name="error_media_buttons">問題が発生しました。アプリから再生を再開してください。</string>
     <string name="error_no_browser">先にブラウザをインストールしてください。</string>
     <string name="error_bad_id">はじめに曲を再生してください。</string>
     <string name="error_no_queue">キューに入っている曲はありません。</string>
+    <string name="error_fs_not_allowed">エラーが発生しました！バッテリー最適化がアプリを停止させた可能性があります。バッテリー最適化を無効化してみてください。(アプリ ＞ 全てのアプリ ＞ Music Player GO ＞ バッテリー ＞ 制限なし)</string>
+    <string name="error_fs_not_allowed_sum">エラーが発生しました！このアプリのバッテリー最適化を解除してください</string>
     <string name="perm_rationale">Music Player GOが音楽を再生するには、ファイルへのアクセス権が必要です。</string>
     <string name="repeat_enabled">１回リピート。</string>
     <string name="repeat_loop_enabled">無限リピート。</string>
@@ -46,20 +47,17 @@
     <string name="theme_pref_auto_title">システム設定</string>
     <string name="accent_pref_title">アクセントカラー</string>
     <string name="active_fragments_pref_title">有効なタブ</string>
-    <string name="active_fragments_pref_warning">すべてのタブを削除することはできません</string>
     <string name="precise_volume_pref_title">無段階の音量調節</string>
     <string name="focus_pref_title">オーディオフォーカス制御</string>
     <string name="headset_pref_title">ヘッドホン端子制御</string>
     <string name="filter_pref_title">フィルター</string>
     <string name="error_list_ended">キューにある曲を再生し終えました。</string>
-    <string name="eq_pref_note_summary">端末の設定からシステムのイコライザーを無効にしないと使用できません</string>
     <string name="notification_actions_repeat">通知領域に表示するボタン</string>
     <string name="fast_seeking_pref_title">早送り・早戻し</string>
     <string name="fast_seeking_pref_summary">早送り・早戻しの間隔（秒）</string>
     <string name="covers_pref_title">アルバムカバーの表示</string>
     <string name="on_list_ended_pref_title">キューの曲を再生し終えた場合 …</string>
     <string name="song_visual_pref_title">曲の表示方法</string>
-    <string name="error_eq">エラーが発生しました</string>
     <string name="song_visual_pref_tl_title">曲名</string>
     <string name="song_visual_pref_fn_title">ファイル名</string>
     <string name="on_list_ended_pref_stop_title">中断する</string>
@@ -88,6 +86,8 @@
     <string name="favorites_save_time">再生位置保存</string>
     <string name="delete">削除</string>
     <string name="equalizer_presets">プリセット</string>
-    <string name="error_fs_not_allowed">エラーが発生しました！バッテリー最適化がアプリを停止させた可能性があります。バッテリー最適化を無効化してみてください。(アプリ ＞ 全てのアプリ ＞ Music Player GO ＞ バッテリー ＞ 制限なし)</string>
-    <string name="error_fs_not_allowed_sum">エラーが発生しました！このアプリのバッテリー最適化を解除してください</string>
+    <string name="confirm_ask_pref_title">確認メッセージ</string>
+    <string name="sleeptimer">スリープタイマー</string>
+    <string name="locale_pref_title">言語</string>
+    <string name="locale_japanese">日本語</string>
 </resources>

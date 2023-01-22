@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -17,10 +15,12 @@ import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.MusicViewModel
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.databinding.FragmentMusicContainersBinding
+import com.iven.musicplayergo.databinding.GenericItemBinding
 import com.iven.musicplayergo.extensions.handleViewVisibility
 import com.iven.musicplayergo.extensions.loadWithError
 import com.iven.musicplayergo.extensions.setTitleColor
 import com.iven.musicplayergo.extensions.waitForCover
+import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.ui.MediaControlInterface
 import com.iven.musicplayergo.ui.UIControlInterface
 import com.iven.musicplayergo.utils.Lists
@@ -92,11 +92,16 @@ class MusicContainersFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mMusicViewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
-
-        mSorting = getSortingMethodFromPrefs()
-        mList = getSortedList()
-        finishSetup()
+        mMusicViewModel =
+            ViewModelProvider(requireActivity())[MusicViewModel::class.java].apply {
+                deviceMusic.observe(viewLifecycleOwner) { returnedMusic ->
+                    if (!returnedMusic.isNullOrEmpty()) {
+                        mSorting = getSortingMethodFromPrefs()
+                        mList = getSortedList()
+                        finishSetup()
+                    }
+                }
+            }
     }
 
     private fun finishSetup() {
@@ -107,9 +112,7 @@ class MusicContainersFragment : Fragment(),
             mListAdapter = MusicContainersAdapter()
             adapter = mListAdapter
             FastScrollerBuilder(this).useMd2Style().build()
-            if (sLaunchedByAlbumView) {
-                recycledViewPool.setMaxRecycledViews(0, 0)
-            }
+            if (sLaunchedByAlbumView) recycledViewPool.setMaxRecycledViews(0, 0)
         }
 
         _musicContainerListBinding?.searchToolbar?.let { stb ->
@@ -139,9 +142,7 @@ class MusicContainersFragment : Fragment(),
             }
         }
 
-        mMediaControlInterface.onGetMediaPlayerHolder()?.let { mp ->
-            tintSleepTimerIcon(enabled = mp.isSleepTimer)
-        }
+        tintSleepTimerIcon(enabled = MediaPlayerHolder.getInstance().isSleepTimer)
     }
 
     fun tintSleepTimerIcon(enabled: Boolean) {
@@ -162,7 +163,6 @@ class MusicContainersFragment : Fragment(),
                     mSorting,
                     mMusicViewModel.deviceMusicByFolder?.keys?.toMutableList()
                 )
-
             else ->
                 Lists.getSortedListWithNull(
                     mSorting,
@@ -195,9 +195,7 @@ class MusicContainersFragment : Fragment(),
     }
 
     private fun setListDataSource(selectedList: List<String>?) {
-        if (!selectedList.isNullOrEmpty()) {
-            mListAdapter.swapList(selectedList)
-        }
+        if (!selectedList.isNullOrEmpty()) mListAdapter.swapList(selectedList)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -242,13 +240,12 @@ class MusicContainersFragment : Fragment(),
     }
 
     private fun saveSortingMethodToPrefs(sortingMethod: Int) {
-        when (mLaunchedBy) {
-            GoConstants.ARTIST_VIEW ->
-                GoPreferences.getPrefsInstance().artistsSorting = sortingMethod
-            GoConstants.FOLDER_VIEW ->
-                GoPreferences.getPrefsInstance().foldersSorting = sortingMethod
-            else ->
-                GoPreferences.getPrefsInstance().albumsSorting = sortingMethod
+        with(GoPreferences.getPrefsInstance()) {
+            when (mLaunchedBy) {
+                GoConstants.ARTIST_VIEW -> artistsSorting = sortingMethod
+                GoConstants.FOLDER_VIEW -> foldersSorting = sortingMethod
+                else -> albumsSorting = sortingMethod
+            }
         }
     }
 
@@ -326,21 +323,16 @@ class MusicContainersFragment : Fragment(),
         override fun getPopupText(position: Int): String {
             if (sIsFastScrollerPopup) {
                 mList?.get(position)?.run {
-                    if (length > 0) {
-                        return first().toString()
-                    }
+                    if (isNotEmpty()) return first().toString()
                 }
             }
             return ""
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ArtistHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.generic_item,
-                parent,
-                false
-            )
-        )
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistHolder {
+            val binding = GenericItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ArtistHolder(binding)
+        }
 
         override fun getItemCount(): Int {
             return mList?.size!!
@@ -350,16 +342,11 @@ class MusicContainersFragment : Fragment(),
             holder.bindItems(mList?.get(holder.absoluteAdapterPosition)!!)
         }
 
-        inner class ArtistHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class ArtistHolder(private val binding: GenericItemBinding): RecyclerView.ViewHolder(binding.root) {
 
             fun bindItems(item: String) {
 
-                with(itemView) {
-
-                    val title = findViewById<TextView>(R.id.title)
-                    val subtitle = findViewById<TextView>(R.id.subtitle)
-                    val selector = findViewById<ImageView>(R.id.selector)
-                    val albumCover = findViewById<ImageView>(R.id.album_cover)
+                with(binding) {
 
                     if (sLaunchedByAlbumView) {
                         albumCover.background.alpha = Theming.getAlbumCoverAlpha(requireContext())
@@ -375,17 +362,14 @@ class MusicContainersFragment : Fragment(),
 
                     selector.handleViewVisibility(show = itemsToHide.contains(item))
 
-                    setOnClickListener {
+                    root.setOnClickListener {
                         if (isActionMode) {
                             setItemViewSelected(item, absoluteAdapterPosition)
-                        } else {
-                            mUiControlInterface.onArtistOrFolderSelected(
-                                item,
-                                mLaunchedBy
-                            )
+                            return@setOnClickListener
                         }
+                        mUiControlInterface.onArtistOrFolderSelected(item, mLaunchedBy)
                     }
-                    setOnLongClickListener {
+                    root.setOnLongClickListener {
                         startActionMode()
                         setItemViewSelected(item, absoluteAdapterPosition)
                         return@setOnLongClickListener true
@@ -414,16 +398,15 @@ class MusicContainersFragment : Fragment(),
         )
 
         private fun startActionMode() {
-            if (!isActionMode) {
-                actionMode = _musicContainerListBinding?.searchToolbar?.startActionMode(actionModeCallback)
-            }
+            if (!isActionMode) actionMode = _musicContainerListBinding?.searchToolbar?.startActionMode(actionModeCallback)
         }
 
         private fun setItemViewSelected(itemTitle: String, position: Int) {
-            if (itemsToHide.contains(itemTitle)) {
-                itemsToHide.remove(itemTitle)
-            } else {
+            if (!itemsToHide.remove(itemTitle)) {
                 itemsToHide.add(itemTitle)
+                mList?.run {
+                    if (itemsToHide.size - 1 >= size - 1) itemsToHide.remove(itemTitle)
+                }
             }
             actionMode?.title = itemsToHide.size.toString()
             notifyItemChanged(position)

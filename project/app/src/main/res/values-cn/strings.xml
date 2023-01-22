@@ -30,10 +30,11 @@
     <string name="error_no_music">请先添加一些音乐。</string>
     <string name="error_not_ready">无法加载音乐库！:(卸载 SD 卡会重建 Android MediaStore 数据库。请稍后再试。</string>
     <string name="error_unknown_unsupported">出了点问题！:( 也许格式不受支持，或者文件夹无法访问（不是 app 的错！）。</string>
-    <string name="error_media_buttons">出了点问题！:( 请从 app 中重新启动播放。</string>
     <string name="error_no_browser">请先安装 Web 浏览器。</string>
     <string name="error_bad_id">先播放一首歌曲。</string>
     <string name="error_no_queue">队列中无歌曲。</string>
+    <string name="error_fs_not_allowed_sum">错误！关闭针对本应用的电池优化</string>
+    <string name="error_fs_not_allowed">出错了！:( 考虑在系统设置中关闭电池优化:应用程序&gt;所有应用程序&gt; Music Player GO &gt;电池&gt;无限制，因为它可能会导致媒体播放器服务停止。</string>
     <string name="perm_rationale">授予 Music Player GO 访问文件的权限，以便播放音乐。</string>
     <string name="repeat_enabled">开启了单曲循环。</string>
     <string name="repeat_loop_enabled">∞ 循环已开启。</string>
@@ -47,7 +48,6 @@
     <string name="theme_pref_auto_title">系统</string>
     <string name="accent_pref_title">自定义</string>
     <string name="active_fragments_pref_title">标签管理</string>
-    <string name="active_fragments_pref_warning">您不能删除所有标签！ :P</string>
     <string name="precise_volume_pref_title">精确的音量控制</string>
     <string name="focus_pref_title">音频焦点管理</string>
     <string name="headset_pref_title">耳机接入管理</string>
@@ -60,12 +60,10 @@
     <string name="equalizer">均衡器</string>
     <string name="covers_pref_title">专辑封面设置</string>
     <string name="on_list_ended_pref_title">当列表结束时 …</string>
-    <string name="eq_pref_note_summary">注意：除非从系统设置中关闭，否则使用系统均衡器。:)</string>
     <string name="song_visual_pref_fn_title">文件名</string>
     <string name="on_list_ended_pref_continue_title">继续</string>
     <string name="on_list_ended_pref_stop_title">停止</string>
     <string name="error_list_ended">列表已结束。</string>
-    <string name="error_eq">出错</string>
     <string name="fast_seeking_pref_summary">快进/快退间隔（秒）</string>
     <string name="equalizer_bb">低音增强</string>
     <string name="favorites_save_time">保存歌曲播放位置</string>
@@ -89,8 +87,6 @@
     <string name="sorting_pref_date_added">新添加的在后</string>
     <string name="pause_on_end_disabled">禁用播放完成后暂停。</string>
     <string name="pause_on_end">播放完成后暂停。</string>
-    <string name="error_fs_not_allowed_sum">错误！关闭针对本应用的电池优化</string>
-    <string name="error_fs_not_allowed">出错了！:( 考虑在系统设置中关闭电池优化:应用程序&gt;所有应用程序&gt; Music Player GO &gt;电池&gt;无限制，因为它可能会导致媒体播放器服务停止。</string>
     <string name="equalizer_presets">预设</string>
     <string name="locale_basque">巴斯克语</string>
     <string name="locale_bengali">孟加拉语</string>
@@ -168,4 +164,21 @@
     <string name="notification_actions_pref_title">附加通知操作</string>
     <string name="notification_actions_favorite_position">添加到收藏（带位置）/关闭</string>
     <string name="notification_actions_favorite">添加到收藏/关闭</string>
+    <string name="filters_error">无法打开隐藏的艺术家/文件夹/专辑。</string>
+    <string name="category_ui">界面</string>
+    <string name="category_audio">音频</string>
+    <string name="eq_pref_title">内置均衡器</string>
+    <string name="eq_pref_sum">强制使用内置均衡器</string>
+    <string name="error_builtin_eq">发生了一个错误！请使用系统均衡器（如果有的话）！</string>
+    <string name="error_sys_eq">系统均衡器不可用！</string>
+    <string name="locale_finnish">芬兰语</string>
+    <string name="rotation_pref_title">锁定旋转</string>
+    <string name="sorting_pref_save">设为默认排序方法？</string>
+    <string name="sorting_pref_reset_neutral">停止询问</string>
+    <string name="sorting_pref_reset">重置歌曲排序</string>
+    <string name="sorting_pref_reset_sum">应用到专辑和文件夹</string>
+    <string name="sorting_pref_reset_confirm">重置排序选项？</string>
+    <string name="locale_azerbaijani">阿塞拜疆语</string>
+    <string name="locale_malayalam">马拉雅拉姆语</string>
+    <string name="locale_punjabi">旁遮普语</string>
 </resources>

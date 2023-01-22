@@ -26,7 +26,8 @@
     <string name="error_bad_id">Először játsszon le egy dalt.</string>
     <string name="error_no_music">Nem található zene.</string>
     <string name="error_unknown_unsupported">Valami rosszul sikerült! :( Lehet, hogy a formátum nem támogatott vagy a mappa nem elérhető (nem az alkalmazás hibája!).</string>
-    <string name="error_media_buttons">Valami rosszul sikerült! :( Kérlek indítsa újra a lejátszást.</string>
+    <string name="error_fs_not_allowed">Valami rosszul sikerült! :( Kérem kapcsolja ki az akkumulátor optimalizálást a rendszer beállításokban: Alkalmazások &gt; Minden alkalmazás &gt; Music Player GO &gt; Akkumulátor &gt; Korlátlan.</string>
+    <string name="error_fs_not_allowed_sum">Hiba! Kapcsolja ki az akkumulátor optimalizálást az MPGO alkalmazásnál</string>
     <string name="on_close_activity">Lejátszás megállítása\?</string>
     <string name="repeat_enabled">Egyszeri ismélés bekapcsolva.</string>
     <string name="repeat_loop_enabled">∞ ismétlés bekapcsolva.</string>
@@ -40,7 +41,6 @@
     <string name="theme_pref_auto_title">Rendzser</string>
     <string name="accent_pref_title">Kiemelés</string>
     <string name="active_fragments_pref_title">Aktív oldalak</string>
-    <string name="active_fragments_pref_warning">Nem tudja eltávolítani az összes oldalt! :P</string>
     <string name="sorting_pref_default">Alapértelmezett</string>
     <string name="precise_volume_pref_title">Pontos hangerő-szabályozás</string>
     <string name="focus_pref_title">Hangfókusz</string>
@@ -57,7 +57,6 @@
     <string name="on_list_ended_pref_stop_title">Megállítás</string>
     <string name="on_list_ended_pref_title">Amikor egy lista véget ér…</string>
     <string name="covers_pref_title">Beágyazott albumborítók</string>
-    <string name="error_eq">Hiba</string>
     <string name="error_list_ended">A lista befejeződött.</string>
     <string name="filter_popup_title">Elrejtés</string>
     <string name="sorting_pref_track_inv">Szám szerint. ↑</string>
@@ -86,9 +85,6 @@
     <string name="sorting_pref_date_added">Legújabb dátum először</string>
     <string name="favorites_save_time">Dal pozíciójának mentése</string>
     <string name="delete">Törlés</string>
-    <string name="error_fs_not_allowed">Valami rosszul sikerült! :( Kérem kapcsolja ki az akkumulátor optimalizálást a rendszer beállításokban: Alkalmazások &gt; Minden alkalmazás &gt; Music Player GO &gt; Akkumulátor &gt; Korlátlan.</string>
-    <string name="error_fs_not_allowed_sum">Hiba! Kapcsolja ki az akkumulátor optimalizálást az MPGO alkalmazásnál</string>
-    <string name="eq_pref_note_summary">Megjegyzés: A rendszer hangerőszabályzó lesz használva hacsak nincs kikapcsolva :)</string>
     <string name="pause_on_end">Szünet dal végén bekapcsolva.</string>
     <string name="pause_on_end_disabled">Szünet dal végén kikapcsolva.</string>
     <string name="locale_basque">Baszk</string>
@@ -168,4 +164,6 @@
     <string name="filters_clear">A filterek ürítve lesznek. Folytassa\?</string>
     <string name="confirm_ask_pref_title">Megerősítő üzenetek</string>
     <string name="confirm_ask_pref_sum">Kérjen megerősítést, mielőtt bármit is tenne</string>
+    <string name="filters_error">Hiba! Nem lehet megnyitni a rejtett előadót/mappát/albumot!</string>
+    <string name="sorting_pref_save">Alap sorrend ként állítani\?</string>
 </resources>

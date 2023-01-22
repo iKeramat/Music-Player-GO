@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -17,11 +16,13 @@ import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.MusicViewModel
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.databinding.FragmentAllMusicBinding
+import com.iven.musicplayergo.databinding.MusicItemBinding
 import com.iven.musicplayergo.extensions.setTitleColor
 import com.iven.musicplayergo.extensions.toFormattedDate
 import com.iven.musicplayergo.extensions.toFormattedDuration
 import com.iven.musicplayergo.extensions.toName
 import com.iven.musicplayergo.models.Music
+import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.ui.MediaControlInterface
 import com.iven.musicplayergo.ui.UIControlInterface
 import com.iven.musicplayergo.utils.Lists
@@ -78,13 +79,18 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mMusicViewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
-
-        mAllMusic = Lists.getSortedMusicListForAllMusic(
-            mSorting,
-            mMusicViewModel.deviceMusicFiltered
-        )
-        finishSetup()
+        mMusicViewModel =
+            ViewModelProvider(requireActivity())[MusicViewModel::class.java].apply {
+                deviceMusic.observe(viewLifecycleOwner) { returnedMusic ->
+                    if (!returnedMusic.isNullOrEmpty()) {
+                        mAllMusic = Lists.getSortedMusicListForAllMusic(
+                            mSorting,
+                            mMusicViewModel.deviceMusicFiltered
+                        )
+                        finishSetup()
+                    }
+                }
+            }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -127,7 +133,7 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
 
                 with(stb.menu) {
 
-                    mSortMenuItem = Lists.getSelectedSortingForAllMusic(mSorting, this).apply {
+                    mSortMenuItem = Lists.getSelectedSortingForMusic(mSorting, this).apply {
                         setTitleColor(Theming.resolveThemeColor(resources))
                     }
 
@@ -144,9 +150,7 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
 
-        mMediaControlInterface.onGetMediaPlayerHolder()?.run {
-            tintSleepTimerIcon(enabled = isSleepTimer)
-        }
+        tintSleepTimerIcon(enabled = MediaPlayerHolder.getInstance().isSleepTimer)
     }
 
     fun tintSleepTimerIcon(enabled: Boolean) {
@@ -159,14 +163,10 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
 
         _allMusicFragmentBinding?.searchToolbar?.setOnMenuItemClickListener {
 
-            if (it.itemId == R.id.default_sorting
-                || it.itemId == R.id.ascending_sorting
-                || it.itemId == R.id.descending_sorting
-                || it.itemId == R.id.date_added_sorting
-                || it.itemId == R.id.date_added_sorting_inv
-                || it.itemId == R.id.artist_sorting
-                || it.itemId == R.id.artist_sorting_inv
-                || it.itemId == R.id.album_sorting
+            if (it.itemId == R.id.default_sorting || it.itemId == R.id.ascending_sorting
+                || it.itemId == R.id.descending_sorting || it.itemId == R.id.date_added_sorting
+                || it.itemId == R.id.date_added_sorting_inv || it.itemId == R.id.artist_sorting
+                || it.itemId == R.id.artist_sorting_inv || it.itemId == R.id.album_sorting
                 || it.itemId == R.id.album_sorting_inv) {
 
                 mSorting = it.order
@@ -175,13 +175,10 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
                 setMusicDataSource(mAllMusic)
 
                 mSortMenuItem.setTitleColor(
-                    Theming.resolveColorAttr(
-                        requireContext(),
-                        android.R.attr.textColorPrimary
-                    )
+                    Theming.resolveColorAttr(requireContext(), android.R.attr.textColorPrimary)
                 )
 
-                mSortMenuItem = Lists.getSelectedSortingForAllMusic(mSorting, menu).apply {
+                mSortMenuItem = Lists.getSelectedSortingForMusic(mSorting, menu).apply {
                     setTitleColor(Theming.resolveThemeColor(resources))
                 }
 
@@ -206,10 +203,7 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(newText: String?): Boolean {
         setMusicDataSource(
             Lists.processQueryForMusic(newText,
-                Lists.getSortedMusicListForAllMusic(
-                    mSorting,
-                    mMusicViewModel.deviceMusicFiltered
-                )
+                Lists.getSortedMusicListForAllMusic(mSorting, mMusicViewModel.deviceMusicFiltered)
             ) ?: mAllMusic)
         return false
     }
@@ -218,20 +212,15 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private inner class AllMusicAdapter : RecyclerView.Adapter<AllMusicAdapter.SongsHolder>(), PopupTextProvider {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SongsHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.music_item,
-                parent,
-                false
-            )
-        )
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongsHolder {
+            val binding = MusicItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return SongsHolder(binding)
+        }
 
         override fun getPopupText(position: Int): String {
             if (sIsFastScrollerPopup) {
                 mAllMusic?.get(position)?.title?.run {
-                    if (length > 0) {
-                        return first().toString()
-                    }
+                    if (isNotEmpty()) return first().toString()
                 }
             }
             return ""
@@ -245,15 +234,11 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
             holder.bindItems(mAllMusic?.get(holder.absoluteAdapterPosition))
         }
 
-        inner class SongsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class SongsHolder(private val binding: MusicItemBinding): RecyclerView.ViewHolder(binding.root) {
 
             fun bindItems(itemSong: Music?) {
 
-                with(itemView) {
-
-                    val title = findViewById<TextView>(R.id.title)
-                    val duration = findViewById<TextView>(R.id.duration)
-                    val subtitle = findViewById<TextView>(R.id.subtitle)
+                with(binding) {
 
                     val formattedDuration = itemSong?.duration?.toFormattedDuration(
                         isAlbum = false,
@@ -266,7 +251,10 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
                     subtitle.text =
                         getString(R.string.artist_and_album, itemSong?.artist, itemSong?.album)
 
-                    setOnClickListener {
+                    root.setOnClickListener {
+                        with(MediaPlayerHolder.getInstance()) {
+                            if (isCurrentSongFM) currentSongFM = null
+                        }
                         mMediaControlInterface.onSongSelected(
                             itemSong,
                             mAllMusic,
@@ -274,7 +262,7 @@ class AllMusicFragment : Fragment(), SearchView.OnQueryTextListener {
                         )
                     }
 
-                    setOnLongClickListener {
+                    root.setOnLongClickListener {
                         val vh = _allMusicFragmentBinding?.allMusicRv?.findViewHolderForAdapterPosition(absoluteAdapterPosition)
                         Popups.showPopupForSongs(
                             requireActivity(),

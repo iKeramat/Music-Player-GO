@@ -21,6 +21,7 @@
     <string name="slash">/</string>
     <string name="unknown_year">N&#x2F;A</string>
     <string name="freq_k">%1dk</string>
+    <string name="favorites_no_position">"&#x20;(00:00)"</string>
 
     <!-- Playback speed menu -->
     <string name="speed_0">0.25x</string>
@@ -37,18 +38,8 @@
     <string name="sorting_pref_ascending">A-Z</string>
     <string name="sorting_pref_descending">Z-A</string>
 
-    <!-- Notifications -->
-    <string name="song_title_notification">&lt;b>%1s&lt;/b></string>
-
     <!-- Extended FAB placeholder -->
     <string name="extended_fab_placeholder">0</string>
-
-    <!-- Extended FAB placeholder -->
-    <string name="eq">EQ</string>
-
-    <!-- Other preferences titles/subtitles -->
-    <string name="category_ui">UI</string>
-    <string name="category_audio">Audio</string>
 
     <!-- Preferences keys used in settings-->
     <string name="theme_pref">theme_pref</string>
@@ -58,35 +49,23 @@
     <string name="theme_pref_black">theme_pref_black</string>
     <string name="accent_pref">color_primary_pref</string>
     <string name="covers_pref">covers_pref</string>
-    <string name="active_tabs_def_pref">active_tabs_def_pref</string>
     <string name="active_tabs_pref">active_tabs_pref</string>
     <string name="on_list_ended_pref">on_list_ended_pref</string>
     <string name="notif_actions_pref">notification_actions_pref</string>
     <string name="fast_seeking_pref">fast_seeking_pref</string>
+    <string name="eq_pref">eq_pref</string>
     <string name="precise_volume_pref">precise_volume_pref</string>
     <string name="focus_pref">focus_pref</string>
     <string name="headset_pref">headsets_pref</string>
     <string name="anim_pref">anim_pref</string>
     <string name="filter_pref">strings_filter_pref</string>
+    <string name="rotation_pref">rotation_pref</string>
+    <string name="reset_sortings_pref">reset_sortings_pref</string>
 
     <!-- Sorting -->
-    <string name="artists_sorting_pref">sorting_artists_pref</string>
-    <string name="albums_sorting_pref">sorting_album_details_pref</string>
-    <string name="folders_sorting_pref">sorting_folder_details_pref</string>
-    <string name="all_music_sorting_pref">sorting_all_music_tab_pref</string>
 
     <!-- Other preferences keys -->
-    <string name="saved_eq_settings">eq_settings_pref</string>
-    <string name="latest_played_song_pref">to_restore_song_pref</string>
-    <string name="is_queue_pref">is_queue_pref</string>
-    <string name="favorites_pref">favorite_songs_pref</string>
-    <string name="queue_pref">queue_songs_pref</string>
-    <string name="latest_volume_pref">latest_volume_pref</string>
-    <string name="latest_playback_vel_pref">latest_playback_vel_pref</string>
     <string name="song_visual_pref">song_visual_pref</string>
     <string name="playback_vel_pref">playback_vel_pref</string>
-    <string name="continue_on_end_pref">continue_on_end_pref</string>
-    <string name="has_completed_playback_pref">has_completed_playback_pref</string>
-    <string name="locale_pref">locale_pref</string>
     <string name="ask_confirmation_pref">ask_confirmation_pref</string>
 </resources>

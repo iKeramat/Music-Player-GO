@@ -11,14 +11,14 @@
     <string name="repeat_disabled">∞ повторення вимкнено.</string>
     <string name="repeat_loop_enabled">∞ повторення увімкнено.</string>
     <string name="repeat_enabled">Одноразове повторення увімкнено.</string>
-    <string name="error_eq">Помилка</string>
     <string name="error_list_ended">Список закінчився.</string>
     <string name="error_no_queue">У черзі немає пісень.</string>
-    <string name="error_media_buttons">Щось пішло не так! :( Перезапустіть відтворення з застосунку.</string>
     <string name="error_unknown_unsupported">Щось пішло не так! :( Можливо, формат не підтримується або тека недоступна (не провина застосунку!).</string>
     <string name="error_not_ready">Не вдалося завантажити музичну бібліотеку! :( Демонтування SD-карти перебудовує базу даних Android MediaStore. Повторіть спробу пізніше.</string>
     <string name="error_no_music">Спочатку додайте музику.</string>
     <string name="error_no_favorites">Спочатку додайте обране.</string>
+    <string name="error_fs_not_allowed_sum">Помилка! Вимкніть оптимізацію акумулятора для MPGO</string>
+    <string name="error_fs_not_allowed">Щось пішло не так! :( Розгляньте можливість вимкнення оптимізації акумулятора в налаштуваннях системи: Програми &gt; Усі програми &gt; Music Player GO &gt; Акумулятор &gt; Не обмежено, оскільки це може призвести до зупинки служби медіапрогравача.</string>
     <string name="favorite_added">%1s (%2s) додано в обране</string>
     <string name="favorites">Обране</string>
     <string name="queue_song_remove">Прибрати %1s з черги\?</string>
@@ -56,8 +56,6 @@
     <string name="notification_actions_repeat">Додаткові дії зі сповіщення</string>
     <string name="fast_seeking_pref_summary">Крок вперед/назад (секунд)</string>
     <string name="fast_seeking_pref_title">Швидкий пошук</string>
-    <string name="eq_pref_note_summary">Примітка: Системний еквалайзер використовується, якщо не вимкнено в системних налаштуваннях. :)</string>
-    <string name="active_fragments_pref_warning">Не можна просто так взяти і закрити всі вкладки! :P</string>
     <string name="active_fragments_pref_title">Активні вкладки</string>
     <string name="song_visual_pref_fn_title">Назва файлу</string>
     <string name="song_visual_pref_tl_title">Назва</string>
@@ -107,8 +105,6 @@
     <string name="locale_vietnamese">В’єтнамська</string>
     <string name="grey">Сірий</string>
     <string name="blue_grey">Сіро-блакитний</string>
-    <string name="error_fs_not_allowed_sum">Помилка! Вимкніть оптимізацію акумулятора для MPGO</string>
-    <string name="error_fs_not_allowed">Щось пішло не так! :( Розгляньте можливість вимкнення оптимізації акумулятора в налаштуваннях системи: Програми &gt; Усі програми &gt; Music Player GO &gt; Акумулятор &gt; Не обмежено, оскільки це може призвести до зупинки служби медіапрогравача.</string>
     <string name="locale_basque">Баскська</string>
     <string name="locale_bengali">Бенгальська</string>
     <string name="locale_belarusian">Білоруська</string>
@@ -168,4 +164,21 @@
     <string name="notification_actions_pref_title">Додаткові дії зі сповіщення</string>
     <string name="notification_actions_fast_seeking">Швидкий пошук</string>
     <string name="notification_actions_favorite">Додати в обране/закрити</string>
+    <string name="filters_error">Неможливо відкрити прихованих виконавців/теки/альбоми.</string>
+    <string name="category_audio">Аудіо</string>
+    <string name="category_ui">інтерфейс користувача</string>
+    <string name="error_builtin_eq">Виникла помилка! Використовуйте системний еквалайзер (якщо він є)!</string>
+    <string name="error_sys_eq">Системний еквалайзер відсутній!</string>
+    <string name="eq_pref_title">Вбудований еквалайзер</string>
+    <string name="eq_pref_sum">Примусове використання вбудованого еквалайзера</string>
+    <string name="locale_finnish">Фінська</string>
+    <string name="rotation_pref_title">Блокування обертання</string>
+    <string name="sorting_pref_save">Налаштувати типовим сортуванням\?</string>
+    <string name="sorting_pref_reset_neutral">Припинити запитувати</string>
+    <string name="sorting_pref_reset_sum">Застосовується до альбомів і тек</string>
+    <string name="sorting_pref_reset_confirm">Налаштування сортування буде скинуто. Продовжити\?</string>
+    <string name="sorting_pref_reset">Скинути сортування доріжок</string>
+    <string name="locale_malayalam">Малаялам</string>
+    <string name="locale_azerbaijani">Азербайджанська</string>
+    <string name="locale_punjabi">Пенджабська</string>
 </resources>

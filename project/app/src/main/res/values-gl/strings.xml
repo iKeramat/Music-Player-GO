@@ -38,10 +38,11 @@
     <string name="error_no_music">Debes engadir algunha música.</string>
     <string name="error_not_ready">Non se cargou a biblioteca de música! :( Desmontar a tarxeta SD reconstrúe a base de datos Android MediaStore. Inténtao máis tarde.</string>
     <string name="error_unknown_unsupported">Algo fallou! :( Quizais o formato escollido non está soportado, ou o cartafol non é accesible (non é culpa da app!).</string>
-    <string name="error_media_buttons">Algo fallou! :( Por favor reinicia a reprodución desde a app.</string>
     <string name="error_no_browser">Instala un navegador web.</string>
     <string name="error_bad_id">Reproduce primeiro unha pista.</string>
     <string name="error_no_queue">Sen cancións na cola.</string>
+    <string name="error_fs_not_allowed_sum">Erro! Desactiva a optimización da batería para MPGO</string>
+    <string name="error_fs_not_allowed">Algo fallou! :( Considera desactivar a optimización da batería nos axustes do sistema: Apps &gt; Tódalas apps &gt; Music Player GO &gt; Batería &gt; Sen restricións, xa que podería facer que o reprodutor se deteña.</string>
     <string name="perm_rationale">Music Player GO precisa acceder aos ficheiros para poder reproducilos.</string>
     <string name="repeat_enabled">Activouse repetir 1 vez.</string>
     <string name="repeat_loop_enabled">Repetición ∞ acendida.</string>
@@ -55,7 +56,6 @@
     <string name="theme_pref_auto_title">Sistema</string>
     <string name="accent_pref_title">Cor</string>
     <string name="active_fragments_pref_title">Lapelas activas</string>
-    <string name="active_fragments_pref_warning">Non podes eliminar todas as lapelas! :P</string>
     <string name="precise_volume_pref_title">Control preciso do volume</string>
     <string name="focus_pref_title">Xestión do foco do audio</string>
     <string name="headset_pref_title">Conexión de auriculares</string>
@@ -75,8 +75,6 @@
     <string name="equalizer_bb">Potenciar baixos</string>
     <string name="equalizer">Ecualizador</string>
     <string name="albums">Álbumes</string>
-    <string name="eq_pref_note_summary">Nota: utilizarase o ecualizador do sistema a non ser que desactives nos axustes do sistema. :)</string>
-    <string name="error_eq">Erro</string>
     <string name="favorites_save_time">Gardar posición da canción</string>
     <string name="open_details_fragment">Abrir detalles do cartafol/artista</string>
     <string name="content_repeat">Activar/desactivar o tipo de repetición</string>
@@ -98,8 +96,6 @@
     <string name="delete">Eliminar</string>
     <string name="pause_on_end">Pausa ao rematar activada.</string>
     <string name="pause_on_end_disabled">Pausa ao rematar desactivada.</string>
-    <string name="error_fs_not_allowed_sum">Erro! Desactiva a optimización da batería para MPGO</string>
-    <string name="error_fs_not_allowed">Algo fallou! :( Considera desactivar a optimización da batería nos axustes do sistema: Apps &gt; Tódalas apps &gt; Music Player GO &gt; Batería &gt; Sen restricións, xa que podería facer que o reprodutor se deteña.</string>
     <string name="equalizer_presets">Configs</string>
     <string name="locale_basque">Éuscaro</string>
     <string name="locale_chinese_s">Chinés (Simplificado)</string>
@@ -172,7 +168,24 @@
     <string name="notification_actions_fast_seeking">Avance rápido</string>
     <string name="notification_actions_pref_title">Accións de notificación adicionais</string>
     <string name="notification_actions_favorite_position">Engadir a favoritos (con posición)/pechar</string>
-    <string name="filters_clear">Vanse limpar os filtros, continuar\?</string>
+    <string name="filters_clear">Limpar filtros?</string>
     <string name="confirm_ask_pref_title">Mensaxes de confirmación</string>
     <string name="confirm_ask_pref_sum">Pedir confirmación antes de facer calquera cousa</string>
+    <string name="filters_error">Non se poden abrir os artistas/álbumes/cartafoles agochados.</string>
+    <string name="category_ui">IU</string>
+    <string name="category_audio">Audio</string>
+    <string name="eq_pref_title">Ecualizador propio</string>
+    <string name="error_builtin_eq">Algo fallou! Usa o ecualizador do sistema (se existe)!</string>
+    <string name="error_sys_eq">O ecualizador do sistema non está dispoñible!</string>
+    <string name="eq_pref_sum">Forzar o uso do ecualizador propio</string>
+    <string name="locale_finnish">Rematar</string>
+    <string name="rotation_pref_title">Bloqueo da rotación</string>
+    <string name="sorting_pref_save">Establecer como orde por defecto?</string>
+    <string name="sorting_pref_reset">Restablecer orde</string>
+    <string name="sorting_pref_reset_sum">Aplícase a álbums e cartafoles</string>
+    <string name="sorting_pref_reset_confirm">Restablecer preferencia da orde?</string>
+    <string name="sorting_pref_reset_neutral">Deixar de preguntar</string>
+    <string name="locale_azerbaijani">Azerbaiyano</string>
+    <string name="locale_malayalam">Malayalam</string>
+    <string name="locale_punjabi">Punjabi</string>
 </resources>

@@ -3,15 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     //noinspection GradleDependency
-    buildToolsVersion "32.0.0"
     defaultConfig {
         applicationId "com.iven.musicplayergo"
         minSdkVersion 21
-        targetSdkVersion 32
-        versionCode 181
-        versionName "4.4.18"
+        targetSdkVersion 33
+        versionCode 186
+        versionName "4.4.23"
 
         vectorDrawables.useSupportLibrary true
         signingConfig signingConfigs.debug
@@ -79,29 +78,30 @@ dependencies {
     //https://github.com/JetBrains/kotlin/blob/master/ChangeLog.md
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     //https://github.com/Kotlin/kotlinx.coroutines/blob/master/CHANGES.md
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
 // Support
     //https://developer.android.com/jetpack/androidx/versions
+    implementation "androidx.activity:activity-ktx:1.6.1"
     implementation 'androidx.browser:browser:1.4.0'
-    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.window:window:1.0.0'
     implementation 'androidx.media:media:1.6.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     //https://github.com/material-components/material-components-android/releases
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.7.0'
 
 // Third-party
     //https://mvnrepository.com/artifact/com.squareup.moshi/moshi-kotlin
-    implementation 'com.squareup.moshi:moshi:1.13.0'
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.13.0'
+    implementation 'com.squareup.moshi:moshi:1.14.0'
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.14.0'
 
     //https://github.com/zhanghai/AndroidFastScroll/releases
     implementation 'me.zhanghai.android.fastscroll:library:1.1.8'
 
     //https://github.com/coil-kt/coil/releases
-    implementation 'io.coil-kt:coil:2.1.0'
+    implementation 'io.coil-kt:coil:2.2.2'
 }

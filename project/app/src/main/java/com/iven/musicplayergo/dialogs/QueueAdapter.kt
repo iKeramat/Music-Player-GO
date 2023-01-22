@@ -2,13 +2,13 @@ package com.iven.musicplayergo.dialogs
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.R
+import com.iven.musicplayergo.databinding.QueueItemBinding
+import com.iven.musicplayergo.extensions.findIndex
 import com.iven.musicplayergo.extensions.startSongFromQueue
 import com.iven.musicplayergo.extensions.toName
 import com.iven.musicplayergo.models.Music
@@ -16,33 +16,24 @@ import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.utils.Theming
 
 
-class QueueAdapter(
-    private val ctx: Context,
-    private val mediaPlayerHolder: MediaPlayerHolder
-) :
-    RecyclerView.Adapter<QueueAdapter.QueueHolder>() {
+class QueueAdapter : RecyclerView.Adapter<QueueAdapter.QueueHolder>() {
 
+    private val mediaPlayerHolder = MediaPlayerHolder.getInstance()
     var queueSongs = mediaPlayerHolder.queueSongs
     private var mSelectedSong = mediaPlayerHolder.currentSong
 
     var onQueueCleared: (() -> Unit)? = null
 
-    private val mDefaultTextColor =
-        Theming.resolveColorAttr(ctx, android.R.attr.textColorPrimary)
-
     fun swapSelectedSong(song: Music?) {
-        notifyItemChanged(queueSongs.indexOf(mSelectedSong))
+        notifyItemChanged(queueSongs.findIndex(mSelectedSong))
         mSelectedSong = song
-        notifyItemChanged(queueSongs.indexOf(mSelectedSong))
+        notifyItemChanged(queueSongs.findIndex(mSelectedSong))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = QueueHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.queue_item,
-            parent,
-            false
-        )
-    )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QueueHolder {
+        val binding = QueueItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return QueueHolder(binding)
+    }
 
     override fun getItemCount() = queueSongs.size
 
@@ -50,34 +41,29 @@ class QueueAdapter(
         holder.bindItems(queueSongs[holder.absoluteAdapterPosition])
     }
 
-    inner class QueueHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class QueueHolder(private val binding: QueueItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bindItems(song: Music) {
 
-            with(itemView) {
+            with(binding) {
 
-                val title = findViewById<TextView>(R.id.title)
-                val duration = findViewById<TextView>(R.id.duration)
-                val subtitle = findViewById<TextView>(R.id.subtitle)
-
+                val context = root.context
                 val displayedTitle = song.toName()
 
                 title.text = displayedTitle
-                duration.text = Dialogs.computeDurationText(ctx, song)
+                duration.text = Dialogs.computeDurationText(context, song)
                 subtitle.text =
                     context.getString(R.string.artist_and_album, song.artist, song.album)
 
-                title.setTextColor(if (mediaPlayerHolder.isQueue != null && mediaPlayerHolder.isQueueStarted && queueSongs.indexOf(mSelectedSong) == absoluteAdapterPosition) {
-                    Theming.resolveThemeColor(resources)
+                title.setTextColor(if (isCurrentIndex(absoluteAdapterPosition)){
+                    Theming.resolveThemeColor(context.resources)
                 } else {
-                    mDefaultTextColor
+                    Theming.resolveColorAttr(context, android.R.attr.textColorPrimary)
                 })
 
-                setOnClickListener {
+                root.setOnClickListener {
                     with(mediaPlayerHolder) {
-                        if (isQueue == null) {
-                            isQueue = currentSong
-                        }
+                        if (isQueue == null) isQueue = currentSong?.copy(startFrom = playerPosition)
                         startSongFromQueue(song)
                     }
                 }
@@ -85,14 +71,20 @@ class QueueAdapter(
         }
     }
 
-    fun performQueueSongDeletion(adapterPosition: Int): Boolean {
+    private fun isCurrentIndex(adapterPosition: Int): Boolean {
+        val isQueue = mediaPlayerHolder.isQueue != null && mediaPlayerHolder.isQueueStarted
+        return isQueue && queueSongs.findIndex(mSelectedSong) == adapterPosition
+    }
+
+    fun performQueueSongDeletion(context: Context, adapterPosition: Int): Boolean {
         val song = queueSongs[adapterPosition]
-        if (GoPreferences.getPrefsInstance().isAskForRemoval) {
+        val prefs = GoPreferences.getPrefsInstance()
+        if (prefs.isAskForRemoval) {
             notifyItemChanged(adapterPosition)
             return if (song != mSelectedSong || mediaPlayerHolder.isQueue == null) {
-                MaterialAlertDialogBuilder(ctx)
+                MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.queue)
-                    .setMessage(ctx.getString(
+                    .setMessage(context.getString(
                         R.string.queue_song_remove,
                         song.title
                     ))
@@ -110,7 +102,7 @@ class QueueAdapter(
                             }
 
                             // update queue songs
-                            GoPreferences.getPrefsInstance().queue = queueSongs
+                            prefs.queue = queueSongs
                         }
                     }
                     .setNegativeButton(R.string.no, null)

@@ -21,9 +21,12 @@
     <color name="grey">#eeeeee</color>
     <color name="blue_grey">#b0bec5</color>
 
-    <color name="widgetsColor">#fafafa</color>
+    <color name="widgets_color">#fafafa</color>
 
-    <color name="mainBg">#151515</color>
-    <color name="systemBarBg">#111111</color>
-    <color name="toolbarBg">@color/systemBarBg</color>
+    <color name="status_bar_color">@color/toolbar_bg</color>
+    <color name="nav_bar_color">@android:color/transparent</color>
+    <color name="nav_bar_color_sheets">@android:color/transparent</color>
+
+    <color name="main_bg">#151515</color>
+    <color name="toolbar_bg">#111111</color>
 </resources>

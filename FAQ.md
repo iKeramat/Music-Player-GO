@@ -39,9 +39,17 @@ As per [guidelines](https://material.io/design/color/dark-theme.html) **desatura
 
 ### Does Music Player GO have or use an equalizer?
 
-Music Player GO uses the system (default) equalizer (**if it exists**) found on the device.
+Yes!
 The equalizer can be found in the "Now Playing" dialog.
-There is also a built-in equalizer. You can enable it by turning off the one in your system.
+
+Note however that by default MPGO tries to open the system equalizer (**if it exists**)!
+You can force the use of the built-in equalizer from the app settings! 
+
+Note: in case of built-in equalizer faults, MPGO tries to fall back to the the system equalizer (**if it exists**) found on the device.
+
+PS: don't blame the devs if equalizer is not working properly, blame the device manufacturer instead!
+
+:)
 
 
 ### What is audio focus?
@@ -97,7 +105,7 @@ Apps > All apps > Music Player GO > Battery > Unrestricted
 
    - Job/real life.
    - Complex feature clashing with the KISS philosophy behind the app: Keep it snimple snupid :)
-   - The rather poor developer is rocking a Xiaomi Mi A1 as the only test device. A good computer could ensure emulator usage.
+   - The rather poor developer is rocking a ~~Xiaomi Mi A1~~ Xiaomi Mi A2 lite as the only test device. A good computer could ensure emulator usage.
    - Keep in mind that the app is built around the **developer's usage needs** and is shared for the love of libre software.
    - Sometimes time is just short…
    - Cyclic lack of motivation/interest in Android development.

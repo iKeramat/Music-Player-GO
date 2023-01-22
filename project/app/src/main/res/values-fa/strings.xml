@@ -32,7 +32,7 @@
     <string name="sorting_pref_artist_inv">بر اساس هنرمند ی-آ</string>
     <string name="sorting_pref_album">بر اساس آلبوم آ-ی</string>
     <string name="sorting_pref_album_inv">بر اساس آلبوم ی-آ</string>
-    <string name="shuffle_am">پخش اتفاقی همهٔ آهنگ‌ها</string>
+    <string name="shuffle_am">پخش اتفاقی همه آهنگ‌ها</string>
     <string name="shuffle_sa">پخش اتفاقی آلبوم برگزیده</string>
     <string name="queue">صف</string>
     <string name="content_playback_speed">سرعت پخش</string>
@@ -48,9 +48,7 @@
     <string name="favorites">مورد علاقه‌ها</string>
     <string name="content_skip_prev">پرش به قبلی</string>
     <string name="content_skip_next">پرش به بعدی</string>
-    <string name="error_eq">خطا</string>
     <string name="active_fragments_pref_title">زبانه‌های فعّال</string>
-    <string name="active_fragments_pref_warning">شما نمی‌توانید همهٔ زبانه‌ها را بردارید!</string>
     <string name="playback_pref_summary_off">فقط یک آهنگ</string>
     <string name="playback_pref_summary_on">نگه‌دار</string>
     <string name="on_list_ended_pref_title">هنگامی که یک فهرست پایان یابد…</string>
@@ -62,4 +60,6 @@
     <string name="anim_pref_title">پویانمایی‌ها</string>
     <string name="equalizer_presets">از پیش تنظیم شده ها</string>
     <string name="on_close_activity">توقف پخش؟</string>
+    <string name="sorting_pref_track_inv">با شماره آهنگ. ↑</string>
+    <string name="sorting_pref_track">با شماره آهنگ. ↓</string>
 </resources>

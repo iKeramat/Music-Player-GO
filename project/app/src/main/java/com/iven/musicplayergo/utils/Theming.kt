@@ -4,6 +4,7 @@ package com.iven.musicplayergo.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.TypedValue
@@ -11,13 +12,11 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import com.google.android.material.appbar.MaterialToolbar
 import com.iven.musicplayergo.GoConstants
 import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.extensions.setIconTint
-import com.iven.musicplayergo.extensions.toSavedMusic
 import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.ui.MainActivity
 
@@ -25,13 +24,11 @@ import com.iven.musicplayergo.ui.MainActivity
 object Theming {
 
     @JvmStatic
-    fun applyChanges(activity: Activity, restoreSettings: Boolean) {
+    fun applyChanges(activity: Activity, currentViewPagerItem: Int) {
         with(activity) {
             finishAfterTransition()
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtras(bundleOf(
-                GoConstants.RESTORE_SETTINGS_FRAGMENT to restoreSettings
-            ))
+            intent.putExtra(GoConstants.RESTORE_FRAGMENT, currentViewPagerItem)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
@@ -49,10 +46,14 @@ object Theming {
     }
 
     @JvmStatic
-    fun isThemeNight(resources: Resources) : Boolean {
+    fun isThemeNight(resources: Resources): Boolean {
         val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return uiMode == Configuration.UI_MODE_NIGHT_YES
     }
+
+    @JvmStatic
+    fun isThemeBlack(resources: Resources) =
+        isThemeNight(resources) && GoPreferences.getPrefsInstance().isBlackTheme
 
     fun getSortIconForSongs(sort: Int): Int {
         return when (sort) {
@@ -63,7 +64,7 @@ object Theming {
         }
     }
 
-    fun getSortIconForSongsDisplayName(sort: Int) : Int {
+    fun getSortIconForSongsDisplayName(sort: Int): Int {
         return when (sort) {
             GoConstants.ASCENDING_SORTING -> R.drawable.ic_sort_alphabetical_descending
             else -> R.drawable.ic_sort_alphabetical_ascending
@@ -129,12 +130,8 @@ object Theming {
     @JvmStatic
     fun resolveTheme(context: Context): Int {
         val position = GoPreferences.getPrefsInstance().accent
-        val stylesRes = if (isThemeNight(context.resources) && GoPreferences.getPrefsInstance().isBlackTheme) {
-            stylesBlack
-        } else {
-            styles
-        }
-        return stylesRes[position]
+        if (isThemeBlack(context.resources)) return stylesBlack[position]
+        return styles[position]
     }
 
     @ColorInt
@@ -153,11 +150,7 @@ object Theming {
     @ColorInt
     @JvmStatic
     fun resolveColorAttr(context: Context, @AttrRes colorAttr: Int): Int {
-        val resolvedAttr: TypedValue =
-            resolveThemeAttr(
-                    context,
-                    colorAttr
-            )
+        val resolvedAttr: TypedValue = resolveThemeAttr(context, colorAttr)
         // resourceId is used if it's a ColorStateList, and data if it's a color reference or a hex color
         val colorRes =
             if (resolvedAttr.resourceId != 0) {
@@ -175,7 +168,7 @@ object Theming {
     @JvmStatic
     fun getAlbumCoverAlpha(context: Context): Int {
         return when {
-            isThemeNight(context.resources) && GoPreferences.getPrefsInstance().isBlackTheme -> 25
+            isThemeBlack(context.resources) -> 25
             isThemeNight(context.resources) -> 15
             else -> 20
         }
@@ -188,6 +181,15 @@ object Theming {
         GoConstants.SONGS_TAB -> R.drawable.ic_music_note
         GoConstants.FOLDERS_TAB -> R.drawable.ic_folder_music
         else -> R.drawable.ic_settings
+    }
+
+    @JvmStatic
+    fun getTabAccessibilityText(tab: String) = when (tab) {
+        GoConstants.ARTISTS_TAB -> R.string.artists
+        GoConstants.ALBUM_TAB -> R.string.albums
+        GoConstants.SONGS_TAB -> R.string.songs
+        GoConstants.FOLDERS_TAB -> R.string.folders
+        else -> R.string.settings
     }
 
     @JvmStatic
@@ -207,17 +209,16 @@ object Theming {
     }
 
     @JvmStatic
-    fun getNotificationActionIcon(action: String,
-                                  mediaPlayerHolder: MediaPlayerHolder,
-                                  isNotification: Boolean) =
-        when (action) {
-            GoConstants.PLAY_PAUSE_ACTION -> if (mediaPlayerHolder.state != GoConstants.PAUSED) {
+    fun getNotificationActionIcon(action: String, isNotification: Boolean): Int {
+        val mediaPlayerHolder = MediaPlayerHolder.getInstance()
+        return when (action) {
+            GoConstants.PLAY_PAUSE_ACTION -> if (mediaPlayerHolder.isPlaying) {
                 R.drawable.ic_pause
             } else {
                 R.drawable.ic_play
             }
             GoConstants.REPEAT_ACTION -> if (isNotification) {
-                getRepeatIcon(mediaPlayerHolder, isNotification = true)
+                getRepeatIcon(isNotification = true)
             } else {
                 R.drawable.ic_repeat
             }
@@ -227,30 +228,34 @@ object Theming {
             GoConstants.FAST_FORWARD_ACTION -> R.drawable.ic_fast_forward
             GoConstants.REWIND_ACTION -> R.drawable.ic_fast_rewind
             GoConstants.FAVORITE_ACTION -> if (isNotification) {
-                getFavoriteIcon(mediaPlayerHolder, isNotification = true)
+                getFavoriteIcon(isNotification = true)
             } else {
                 R.drawable.ic_favorite
             }
             else -> R.drawable.ic_save_time
         }
+    }
 
     @JvmStatic
-    fun getRepeatIcon(mediaPlayerHolder: MediaPlayerHolder, isNotification: Boolean) = when {
-        mediaPlayerHolder.isRepeat1X -> R.drawable.ic_repeat_one
-        mediaPlayerHolder.isLooping -> R.drawable.ic_repeat
-        else -> if (isNotification) {
-            R.drawable.ic_repeat_one_disabled_alt
-        } else {
-            R.drawable.ic_repeat_one_disabled
+    fun getRepeatIcon(isNotification: Boolean): Int {
+        val mediaPlayerHolder = MediaPlayerHolder.getInstance()
+        return when {
+            mediaPlayerHolder.isRepeat1X -> R.drawable.ic_repeat_one
+            mediaPlayerHolder.isLooping -> R.drawable.ic_repeat
+            else -> if (isNotification) {
+                R.drawable.ic_repeat_one_disabled_alt
+            } else {
+                R.drawable.ic_repeat_one_disabled
+            }
         }
     }
 
     @JvmStatic
-    fun getFavoriteIcon(mediaPlayerHolder: MediaPlayerHolder, isNotification: Boolean): Int {
+    fun getFavoriteIcon(isNotification: Boolean): Int {
+        val mediaPlayerHolder = MediaPlayerHolder.getInstance()
         val favorites = GoPreferences.getPrefsInstance().favorites
         val isFavorite = favorites != null && favorites.contains(
-            mediaPlayerHolder.currentSong?.toSavedMusic(0, mediaPlayerHolder.launchedBy)
-        )
+            mediaPlayerHolder.currentSong?.copy(startFrom = 0, launchedBy = mediaPlayerHolder.launchedBy))
         return if (isFavorite) {
             R.drawable.ic_favorite
         } else {
@@ -267,7 +272,15 @@ object Theming {
         tb.menu.findItem(R.id.sleeptimer).setIconTint(if (isEnabled) {
             resolveThemeColor(tb.resources)
         } else {
-            ContextCompat.getColor(tb.context, R.color.widgetsColor)
+            ContextCompat.getColor(tb.context, R.color.widgets_color)
         })
+    }
+
+    @JvmStatic
+    fun getOrientation(): Int {
+        if (GoPreferences.getPrefsInstance().lockRotation) {
+            return ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        }
+        return ActivityInfo.SCREEN_ORIENTATION_FULL_USER
     }
 }

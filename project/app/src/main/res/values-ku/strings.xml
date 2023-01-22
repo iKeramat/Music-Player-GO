@@ -30,10 +30,11 @@
     <string name="error_no_music">Pêşî hinek stranan tevlî bike.</string>
     <string name="error_not_ready">Nikare pirtûkxaneya muzîkê bar bike! :( Rakirina kerta SD databasa Android MediaStore ji nû ve ava dike. Paşê dîsa biceribîne.</string>
     <string name="error_unknown_unsupported">Tiştek çewt pêk hat! :( Belkî format nayê piştgirîkirin, an jî gihiştîn bo peldankê ne pêkan e (ne sucê sepanê ye!).</string>
-    <string name="error_media_buttons">Tiştek çewt pêk hat! :( Jkx stranê ji nû ve bide lêdan.</string>
     <string name="error_no_browser">Pêşî gerokeke tevnê saz bike.</string>
     <string name="error_bad_id">Pêşî stranekê lêde.</string>
     <string name="error_no_queue">Stran di rêzê de tune.</string>
+    <string name="error_fs_not_allowed">Tiştek çewt pêk hat! :( Dibe ku optimîzasyona battariyê çalak be û ev yek dibe sedem ku lêdera medyayê rawestê. Di sazkariyên pergalê de binêre û neçalak bike: Sepan &gt; Hemû sepan &gt; Lêdera muzîkê GO &gt; Battarî &gt; Neçalak e.</string>
+    <string name="error_fs_not_allowed_sum">Çewtî! Ji bo MPGO optimîzasyona batteriyê vemrîne</string>
     <string name="perm_rationale">Mafê gihiştînê bide Music Player GO bo pelên muzîkê te.</string>
     <string name="repeat_enabled">Carekî tenê dubare bike.</string>
     <string name="repeat_disabled">∞ dubarekirin neçalak e.</string>
@@ -43,9 +44,6 @@
     <string name="theme_pref_light_title">Ron</string>
     <string name="theme_pref_dark_title">Tarî</string>
     <string name="theme_pref_auto_title">Pergal</string>
-    <string name="error_fs_not_allowed">Tiştek çewt pêk hat! :( Dibe ku optimîzasyona battariyê çalak be û ev yek dibe sedem ku lêdera medyayê rawestê. Di sazkariyên pergalê de binêre û neçalak bike: Sepan &gt; Hemû sepan &gt; Lêdera muzîkê GO &gt; Battarî &gt; Neçalak e.</string>
-    <string name="error_fs_not_allowed_sum">Çewtî! Ji bo MPGO optimîzasyona batteriyê vemrîne</string>
-    <string name="eq_pref_note_summary">Nîşe: Heya ku ji sazkariyên pergalê neyê girtin yeksanekera pergalê tê bikaranîn. :)</string>
     <string name="precise_volume_pref_title">Kontrolkirina dengî ya rast</string>
     <string name="focus_pref_title">Balkêşandina dengî</string>
     <string name="headset_pref_title">Rêveberiya berguhikê</string>
@@ -78,8 +76,6 @@
     <string name="content_skip_next">Derbasî ya pêş bibe</string>
     <string name="accent_pref_title">Rengê devokê</string>
     <string name="equalizer_bb">Bass bilind bike</string>
-    <string name="error_eq">Çewtî</string>
-    <string name="active_fragments_pref_warning">Tu nikarî hemû rûgeran rakî! :P</string>
     <string name="on_list_ended_pref_stop_title">Rawestîne</string>
     <string name="fast_seeking_pref_title">Lêgerîna bilez</string>
     <string name="equalizer_v">Dengê derdorê</string>
@@ -160,4 +156,13 @@
     <string name="theme_pref_black_title">Reş zelal</string>
     <string name="cancel">Têk bibe</string>
     <string name="ok">BAŞ E</string>
+    <string name="confirm_ask_pref_sum">Berî ku tiştek pêk be, ji bo pejirandinê bipirse</string>
+    <string name="notification_actions_pref_title">Çalakiyên agahdariyê yên din</string>
+    <string name="notification_actions_favorite_position">Tevlî bijarteyan bike (Li gel cîh)/bigire</string>
+    <string name="notification_actions_favorite">Tevlî bijarteyan bike/bigire</string>
+    <string name="filters_error">Şaşetî! Nikare hunermend/peldank/album ên veşartî vekê!</string>
+    <string name="confirm_ask_pref_title">Peyamên pejirandinê</string>
+    <string name="continue_on_end_desc">Hilbijêre ka lêdana stranê bidomînî an jî li ser qedandinê rawestînî</string>
+    <string name="notification_actions_fast_seeking">lêgerîna bi lez</string>
+    <string name="filters_clear">Parzûn wê werin rakirin. bidomîne\?</string>
 </resources>

@@ -10,35 +10,37 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.RecyclerView
 import coil.Coil
 import coil.request.ImageRequest
 import com.iven.musicplayergo.GoConstants
 import com.iven.musicplayergo.GoPreferences
+import com.iven.musicplayergo.MusicViewModel
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.models.Music
 import com.iven.musicplayergo.player.MediaPlayerHolder
+import com.iven.musicplayergo.utils.Lists
+import com.iven.musicplayergo.utils.MusicUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 
-fun MediaPlayerHolder.startSongFromQueue(song: Music?) {
+fun MediaPlayerHolder.startSongFromQueue(selectedSong: Music?) {
+    selectedSong?.let { song ->
+        queueSongs.findIndex(song).takeIf { it != RecyclerView.NO_POSITION }?.let { position ->
+            queueSongs[position] = song
+        }
 
-    if (canRestoreQueue) {
-        canRestoreQueue = false
+        if (canRestoreQueue) canRestoreQueue = false
+        if (isSongFromPrefs) isSongFromPrefs = false
+        if (!isPlay) isPlay = true
+        if (!isQueueStarted) isQueueStarted = true
+
+        currentSong = song
+        initMediaPlayer(currentSong, forceReset = false)
     }
-    if (isSongFromPrefs) {
-        isSongFromPrefs = false
-    }
-    if (!isPlay) {
-        isPlay = true
-    }
-    if (!isQueueStarted) {
-        isQueueStarted = true
-    }
-    currentSong = song
-    initMediaPlayer(currentSong, forceReset = false)
 }
 
 fun MediaPlayerHolder.setCanRestoreQueue() {
@@ -46,18 +48,25 @@ fun MediaPlayerHolder.setCanRestoreQueue() {
         canRestoreQueue = isQueue == null && !isQueueStarted && queueSongs.isNotEmpty()
     }
     if (isQueue == null) {
-        isQueue = currentSong
+        isQueue = currentSong?.copy(startFrom = playerPosition)
         setQueueEnabled(enabled = true, canSkip = false)
     }
 }
 
 fun MediaPlayerHolder.addSongsToNextQueuePosition(songsToQueue: List<Music>) {
-    if (isQueue != null && !canRestoreQueue && isQueueStarted) {
-        val currentPosition = queueSongs.indexOf(currentSong)
-        queueSongs.addAll(currentPosition+1, songsToQueue)
-    } else {
-        queueSongs.addAll(songsToQueue)
+
+    fun removeDuplicates() {
+        queueSongs = queueSongs.distinctBy { it.id to it.albumId }.toMutableList()
     }
+
+    if (isQueue != null && !canRestoreQueue && isQueueStarted) {
+        val currentPosition = queueSongs.findIndex(currentSong)
+        queueSongs.addAll(currentPosition+1, songsToQueue)
+        removeDuplicates()
+        return
+    }
+    queueSongs.addAll(songsToQueue)
+    removeDuplicates()
 }
 
 //https://codereview.stackexchange.com/a/97819
@@ -90,18 +99,15 @@ fun Uri.toBitrate(context: Context): Pair<Int, Int>? {
     }
 }
 
-fun Long.toAlbumArtURI(): Uri {
-    return ContentUris.withAppendedId("content://media/external/audio/albumart".toUri(), this)
-}
+fun Long.toAlbumArtURI(): Uri = ContentUris.withAppendedId(
+    "content://media/external/audio/albumart".toUri(),
+    this
+)
 
 fun Long.waitForCover(context: Context, onDone: (Bitmap?, Boolean) -> Unit) {
     Coil.imageLoader(context).enqueue(
         ImageRequest.Builder(context)
-            .data(if (GoPreferences.getPrefsInstance().isCovers) {
-                toAlbumArtURI()
-            } else {
-                null
-            })
+            .data(if (GoPreferences.getPrefsInstance().isCovers) toAlbumArtURI() else null)
             .target(
                 onSuccess = { onDone(it.toBitmap(), false) },
                 onError = { onDone(null, true) }
@@ -112,7 +118,7 @@ fun Long.waitForCover(context: Context, onDone: (Bitmap?, Boolean) -> Unit) {
 
 fun Long.toFormattedDuration(isAlbum: Boolean, isSeekBar: Boolean) = try {
 
-    val defaultFormat = if (isAlbum) { "%02dm:%02ds" } else { "%02d:%02d" }
+    val defaultFormat = if (isAlbum) "%02dm:%02ds" else "%02d:%02d"
 
     val hours = TimeUnit.MILLISECONDS.toHours(this)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(this)
@@ -157,46 +163,57 @@ fun Int.toFormattedDate(): String {
     }
 }
 
-fun Int.toFormattedTrack() = try {
-    if (this >= 1000) {
-        this % 1000
-    } else {
-        this
+fun Int.toFormattedTrack(): Int {
+    try {
+        if (this >= 1000) return this % 1000
+        return this
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return 0
     }
-} catch (e: Exception) {
-    e.printStackTrace()
-    0
 }
 
-fun Int.toFormattedYear(resources: Resources) =
-    if (this != 0) {
-        toString()
-    } else {
-        resources.getString(R.string.unknown_year)
+fun Int.toFormattedYear(resources: Resources): String {
+    if (this != 0) return toString()
+    return resources.getString(R.string.unknown_year)
+}
+
+fun List<Music>.findIndex(song: Music?) = indexOfFirst {
+    it.id == song?.id && it.albumId == song?.albumId
+}
+
+fun Music?.toName(): String? {
+    if (GoPreferences.getPrefsInstance().songsVisualization == GoConstants.FN) {
+        return this?.displayName?.toFilenameWithoutExtension()
     }
+    return this?.title
+}
 
-fun Music.toSavedMusic(playerPosition: Int, savedLaunchedBy: String) =
-    Music(
-        artist,
-        year,
-        track,
-        title,
-        displayName,
-        duration,
-        album,
-        albumId,
-        relativePath,
-        id,
-        savedLaunchedBy,
-        playerPosition,
-        dateAdded
+fun String?.findSorting(launchedBy: String) = GoPreferences.getPrefsInstance().sortings?.firstOrNull {
+    it.albumOrFolder == this && it.launchedBy == launchedBy && it.songVisualization == GoPreferences.getPrefsInstance().songsVisualization
+}
+
+fun Music.findSorting() = GoPreferences.getPrefsInstance().sortings?.firstOrNull {
+    it.albumOrFolder == album && it.launchedBy == launchedBy && it.songVisualization == GoPreferences.getPrefsInstance().songsVisualization
+}
+
+fun Music.findRestoreSorting(launchedBy: String): Int {
+    val sorting = when (launchedBy) {
+        GoConstants.ARTIST_VIEW -> findSorting()
+        GoConstants.FOLDER_VIEW -> relativePath?.findSorting(GoConstants.FOLDER_VIEW)
+        else -> album?.findSorting(GoConstants.ALBUM_VIEW)
+    }
+    return sorting?.sorting ?: Lists.getUserSorting(launchedBy)?.sorting ?: Lists.getDefSortingMode()
+}
+
+fun Music.findRestoreSongs(sorting: Int, musicViewModel: MusicViewModel) = when (launchedBy) {
+    GoConstants.ARTIST_VIEW -> {
+        val songs = MusicUtils.getAlbumSongs(artist, album, musicViewModel.deviceAlbumsByArtist)
+        Lists.getSortedMusicList(sorting, songs)
+    }
+    GoConstants.FOLDER_VIEW -> Lists.getSortedMusicListForFolder(
+        sorting,
+        musicViewModel.deviceMusicByFolder?.get(relativePath)
     )
-
-fun List<Music>.savedSongIsAvailable(currentSong: Music?) : Music? =
-    find { currentSong?.title == it.title && currentSong?.displayName == it.displayName && currentSong?.track == it.track && currentSong.albumId == it.albumId && currentSong.album == it.album }
-
-fun Music?.toName(): String? = if (GoPreferences.getPrefsInstance().songsVisualization == GoConstants.FN) {
-    this?.displayName?.toFilenameWithoutExtension()
-} else {
-    this?.title
+    else -> Lists.getSortedMusicListForFolder(sorting, musicViewModel.deviceMusicByAlbum?.get(album))
 }

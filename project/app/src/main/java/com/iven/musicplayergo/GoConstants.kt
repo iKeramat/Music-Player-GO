@@ -23,9 +23,7 @@ object GoConstants {
     const val ALBUM_VIEW = "1"
     const val FOLDER_VIEW = "2"
 
-    const val RESTORE_SETTINGS_FRAGMENT = "RESTORE_SETTINGS_FRAGMENT"
     const val RESTORE_FRAGMENT = "RESTORE_FRAGMENT"
-    const val RESTORE_DIALOG_TYPE = "RESTORE_DIALOG_TYPE"
 
     // playback speed options
     const val PLAYBACK_SPEED_ONE_ONLY = "0"
@@ -58,7 +56,6 @@ object GoConstants {
     // fragments tags
     const val DETAILS_FRAGMENT_TAG = "DETAILS_FRAGMENT"
     const val ERROR_FRAGMENT_TAG = "ERROR_FRAGMENT"
-    const val EQ_FRAGMENT_TAG = "EQ_FRAGMENT"
 
     // Player playing statuses
     const val PLAYING = PlaybackStateCompat.STATE_PLAYING

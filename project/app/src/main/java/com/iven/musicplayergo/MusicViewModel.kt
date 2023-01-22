@@ -1,6 +1,5 @@
 package com.iven.musicplayergo
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.res.Resources
 import android.provider.MediaStore
@@ -15,7 +14,7 @@ import java.io.File
 import kotlin.random.Random
 
 
-class MusicViewModel(application: Application) : AndroidViewModel(application) {
+class MusicViewModel(application: Application): AndroidViewModel(application) {
 
     /**
      * This is the job for all coroutines started by this ViewModel.
@@ -53,7 +52,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     //keys: artist || value: songs contained in the folder
     var deviceMusicByFolder: Map<String, List<Music>>? = null
 
-    fun getRandomMusic() : Music? {
+    fun getRandomMusic(): Music? {
         deviceMusicFiltered?.shuffled()?.run {
            return get(Random.nextInt(size))
         }
@@ -83,7 +82,6 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    @SuppressLint("InlinedApi")
     @Suppress("DEPRECATION")
     fun queryForMusic(application: Application) =
 
@@ -157,15 +155,11 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
                          if (Versioning.isQ()) {
                              audioRelativePath ?: application.getString(R.string.slash)
                          } else {
-                             val returnedPath = File(audioRelativePath).parentFile?.name
-                                 ?: application.getString(R.string.slash)
-                             if (returnedPath != "0") {
-                                 returnedPath
-                             } else {
-                                 application.getString(
-                                                R.string.slash
-                                        )
+                             var returnedPath = File(audioRelativePath).parentFile?.name
+                             if (returnedPath == null || returnedPath == "0") {
+                                 returnedPath = application.getString(R.string.slash)
                              }
+                             returnedPath
                          }
 
                      // Add the current music to the list
@@ -196,7 +190,9 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun getMusic(application: Application): MutableList<Music> {
         synchronized(startQuery(application)) {
-            buildLibrary(application.resources)
+            if (mDeviceMusicList.isNotEmpty()) {
+                buildLibrary(application.resources)
+            }
         }
         return mDeviceMusicList
     }
@@ -234,13 +230,83 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
                 iterate.next()?.let { artistKey ->
                     val album = deviceSongsByArtist?.getValue(artistKey)
                     deviceAlbumsByArtist?.set(
-                        artistKey, MusicUtils.buildSortedArtistAlbums(
-                            resources,
-                            album
-                        )
+                        artistKey, MusicUtils.buildSortedArtistAlbums(resources, album)
                     )
                 }
             }
+        }
+        updatePreferences()
+    }
+
+    private fun updatePreferences() {
+        // update queue/favorites by updating moved songs id, albumId
+        // and filtering out deleted songs
+
+        val prefs = GoPreferences.getPrefsInstance()
+
+        deviceMusicFiltered?.let { deviceMusic ->
+
+            // update queue songs id
+            prefs.queue?.run {
+                val updatedQueue = map {
+                    val music = findMusic(it)
+                    it.copy(albumId = music?.albumId, id= music?.id)
+                }
+                // filter queue to remove songs not available on the device
+                prefs.queue = updatedQueue.filter { deviceMusic.contains(it.copy(startFrom = 0))}
+            }
+
+            // update favorite songs id
+            prefs.favorites?.run {
+                val updatedFavorites = map {
+                    val music = findMusic(it)
+                    it.copy(albumId = music?.albumId, id= music?.id)
+                }
+                prefs.favorites = updatedFavorites.filter { deviceMusic.contains(it.copy(startFrom = 0))}
+            }
+
+            // check if pre queue song exists and update id
+            if (prefs.isQueue != null) {
+                prefs.isQueue?.let { preQueueSong ->
+                    val found = findMusic(preQueueSong)
+                    prefs.isQueue = if (found != null) {
+                        preQueueSong.copy(albumId = found.albumId, id = found.id)
+                    } else {
+                        getRandomMusic()
+                    }
+                }
+            }
+
+            // check if latestPlayedSong exists and update id
+            if (prefs.latestPlayedSong == null) {
+                prefs.latestPlayedSong = getRandomMusic()
+            } else {
+                prefs.latestPlayedSong?.let { lps ->
+                    val found = findMusic(lps)
+                    prefs.latestPlayedSong = if (found != null) {
+                        lps.copy(albumId = found.albumId, id = found.id)
+                    } else {
+                        // if queue had started, update latestPlayedSong
+                        // picking the first queued song
+                        prefs.queue?.let { queue ->
+                            if (prefs.isQueue != null && queue.isNotEmpty()) {
+                                prefs.latestPlayedSong = queue[0]
+                            }
+                            return
+                        }
+                        getRandomMusic()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun findMusic(song: Music?): Music? {
+        val songToFind = song?.copy(startFrom = 0)
+        return deviceMusicFiltered?.find { newMusic ->
+            songToFind?.title == newMusic.title && songToFind?.displayName == newMusic.displayName
+                    && songToFind?.track == newMusic.track && songToFind.album == newMusic.album
+                    && songToFind.year == newMusic.year && songToFind.duration == newMusic.duration
         }
     }
 }

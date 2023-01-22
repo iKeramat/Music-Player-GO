@@ -31,8 +31,6 @@
     <string name="filter_popup_title">Скрий</string>
     <string name="queue">Опашка</string>
     <string name="theme_pref_title">Тема</string>
-    <string name="error_eq">Грешка</string>
-    <string name="error_fs_not_allowed_sum">Грешка! Изклочи оптимизация на батерията за MPGO</string>
     <string name="repeat_enabled">Повтаряне на една песен е включено.</string>
     <string name="repeat_loop_enabled">∞ повтаряне е включено.</string>
     <string name="pause_on_end">Спри когато свърши е включено.</string>
@@ -42,7 +40,8 @@
     <string name="error_no_queue">Няма песни в опашката.</string>
     <string name="error_bad_id">Пусни песен първо.</string>
     <string name="error_no_browser">Изтегли уеб браузер първо.</string>
-    <string name="error_media_buttons">Нещо се обърка! :( Моля рестартирай възпроизвеждането от приложението.</string>
+    <string name="error_fs_not_allowed">Нещо се обърка! :( Пробвай да изключиш оптимизацията на батерията в настройките: Приложения &gt; Всички приложения &gt; Music Player GO &gt; Батерия &gt; Неограничени, защото може да накара плейъра да спре.</string>
+    <string name="error_fs_not_allowed_sum">Грешка! Изклочи оптимизация на батерията за MPGO</string>
     <string name="open_details_fragment">Отвори детайли на изпълнител/папка</string>
     <string name="open_git_pref_summary">Отвори уебстраницата на проекта за повече информация :)</string>
     <string name="content_repeat">Включи/Изключи избрано повторение</string>
@@ -61,7 +60,6 @@
     <string name="locale_thai">Тайландски</string>
     <string name="locale_vietnamese">Виетнамски</string>
     <string name="locale_urdu">Урду (Пакистан)</string>
-    <string name="eq_pref_note_summary">Забележка: Изравнителя на системата е използван освен ако не е изклочен от настройките на системата. :)</string>
     <string name="precise_volume_pref_title">Точен контрол над сила на звука</string>
     <string name="focus_pref_title">Управление на аудио фокуса</string>
     <string name="playback_pref_title">Избрана скорост на възпроизвеждане</string>
@@ -126,7 +124,6 @@
     <string name="locale_pref_title">Език</string>
     <string name="locale_basque">Баски</string>
     <string name="locale_bengali">Бенгалски</string>
-    <string name="active_fragments_pref_warning">Не може просто да затвориш всички прозорци! :Р</string>
     <string name="locale_arabic">Арабски</string>
     <string name="locale_arabic_egypt">Арабски (Египет)</string>
     <string name="locale_czech">Чешки</string>
@@ -146,7 +143,6 @@
     <string name="locale_kurdish">Кюрдски</string>
     <string name="locale_norwegian_b">Норвежки (Букмол)</string>
     <string name="locale_persian">Персийски</string>
-    <string name="error_fs_not_allowed">Нещо се обърка! :( Пробвай да изключиш оптимизацията на батерията в настройките: Приложения &gt; Всички приложения &gt; Music Player GO &gt; Батерия &gt; Неограничени, защото може да накара плейъра да спре.</string>
     <string name="pause_on_end_disabled">Спри когато свърши е извключено.</string>
     <string name="repeat_disabled">∞ повтаряне е извключено.</string>
     <string name="content_playback_speed">Скорост на възпроизвеждане</string>

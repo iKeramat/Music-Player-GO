@@ -1,12 +1,16 @@
 package com.iven.musicplayergo.preferences
 
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -15,9 +19,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.databinding.FragmentSettingsBinding
-import com.iven.musicplayergo.extensions.toToast
 import com.iven.musicplayergo.ui.UIControlInterface
-import com.iven.musicplayergo.utils.Theming
+import com.iven.musicplayergo.utils.Versioning
+
 
 /**
  * A simple [Fragment] subclass.
@@ -78,31 +82,29 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    fun getPreferencesFragment() = mPreferencesFragment
+
+    @SuppressLint("SuspiciousIndentation")
     private fun openLocaleSwitcher() {
         val locales = ContextUtils.getLocalesList(resources)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.locale_pref_title)
-            .setItems(locales.values.toTypedArray()) { _, which ->
-                // Respond to item chosen
-                val newLocale = locales.keys.elementAt(which)
-                if (GoPreferences.getPrefsInstance().locale != newLocale) {
-                    GoPreferences.getPrefsInstance().locale = locales.keys.elementAt(which)
-                    Theming.applyChanges(requireActivity(), restoreSettings = true)
-                }
+        val dialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.locale_pref_title).setItems(locales.values.toTypedArray()) { _, which ->
+            // Respond to item chosen
+            val newLocale = locales.keys.elementAt(which)
+            if (GoPreferences.getPrefsInstance().locale != newLocale) {
+                GoPreferences.getPrefsInstance().locale = locales.keys.elementAt(which)
+                mUIControlInterface.onAppearanceChanged(isThemeChanged = false)
             }
-            .setNegativeButton(R.string.cancel, null)
+        }.setNegativeButton(R.string.cancel, null)
 
-            if (GoPreferences.getPrefsInstance().locale != null) {
-                dialog.setNeutralButton(R.string.sorting_pref_default) { _, _ ->
-                    GoPreferences.getPrefsInstance().locale = null
-                    Theming.applyChanges(requireActivity(), restoreSettings = false)
-                }
+        if (GoPreferences.getPrefsInstance().locale != null) {
+            dialog.setNeutralButton(R.string.sorting_pref_default) { _, _ ->
+                GoPreferences.getPrefsInstance().locale = null
+                mUIControlInterface.onAppearanceChanged(isThemeChanged = false)
             }
+        }
         dialog.show()
     }
 
-    @SuppressLint("QueryPermissionsNeeded")
     private fun openGitHubPage() {
        val customTabsIntent = CustomTabsIntent.Builder()
            .setShareState(CustomTabsIntent.SHARE_STATE_ON)
@@ -110,21 +112,35 @@ class SettingsFragment : Fragment() {
            .build()
 
         val parsedUri = getString(R.string.app_git).toUri()
-        val manager = requireContext().packageManager
-        val info = manager.queryIntentActivities(customTabsIntent.intent, 0)
+
+        val info = solveInfo(customTabsIntent.intent)
+
         if (info.size > 0) {
             customTabsIntent.launchUrl(requireContext(), parsedUri)
-        } else {
-            //from: https://github.com/immuni-app/immuni-app-android/blob/development/extensions/src/main/java/it/ministerodellasalute/immuni/extensions/utils/ExternalLinksHelper.kt
-            val browserIntent = Intent(Intent.ACTION_VIEW, parsedUri)
-            browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            return
+        }
 
-            val fallbackInfo = manager.queryIntentActivities(browserIntent, 0)
-            if (fallbackInfo.size > 0) {
-                requireContext().startActivity(browserIntent)
-            } else {
-                R.string.error_no_browser.toToast(requireContext())
-            }
+        //from: https://github.com/immuni-app/immuni-app-android/blob/development/extensions/src/main/java/it/ministerodellasalute/immuni/extensions/utils/ExternalLinksHelper.kt
+        val browserIntent = Intent(Intent.ACTION_VIEW, parsedUri)
+        browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+        val fallbackInfo = solveInfo(browserIntent)
+        if (fallbackInfo.size > 0) {
+            requireContext().startActivity(browserIntent)
+            return
+        }
+        Toast.makeText(requireContext(), R.string.error_no_browser, Toast.LENGTH_SHORT).show()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun solveInfo(intent: Intent): MutableList<ResolveInfo> {
+        val manager = requireContext().packageManager
+        return if (Versioning.isTiramisu()) {
+            manager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(
+                PackageManager.MATCH_DEFAULT_ONLY.toLong()
+            ))
+        } else {
+            manager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
         }
     }
 

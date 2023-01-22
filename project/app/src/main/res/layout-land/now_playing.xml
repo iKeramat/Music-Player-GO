@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:baselineAligned="false"
     android:clickable="false"
     android:focusable="false"
+    android:gravity="center"
     android:orientation="horizontal"
     tools:context=".ui.MainActivity">
 
@@ -12,9 +14,10 @@
     <include layout="@layout/now_playing_cover" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <!-- the album's title -->
@@ -23,12 +26,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="16dp"
             android:background="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:id="@+id/np_song"
@@ -41,7 +44,7 @@
                 android:paddingBottom="4dp"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textAlignment="center"
+                android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textStyle="bold" />
@@ -56,7 +59,7 @@
                 android:paddingEnd="16dp"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textAlignment="center"
+                android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:textColor="?android:attr/textColorSecondary" />
 
@@ -64,11 +67,12 @@
                 android:id="@+id/np_rates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:alpha="0.5"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:text="@string/unknown_year"
-                android:textAlignment="center"
+                android:textAlignment="textStart"
                 android:textAppearance="@android:style/TextAppearance.Material.Caption"
                 android:textColor="?android:attr/textColorTertiary" />
         </LinearLayout>

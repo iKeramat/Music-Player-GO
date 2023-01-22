@@ -31,7 +31,6 @@
     <string name="error_no_music">Nie znaleziono muzyki :(</string>
     <string name="error_not_ready">Wystąpił błąd dotyczący biblioteki muzyki! :( Być może problem dotyczy karty SD, która czasami zostaje odłączona wymuszając na programie Android MediaStore przebudowanie swoich rekordów w bazie danych. Rozwiązanie: spróbuj ponownie później ;)</string>
     <string name="error_unknown_unsupported">Coś poszło nie tak! :( Prawdopodobnie to wina niewspieranego formatu pliku lub lokalizacji pliku, która może być niedostępna (to nie wina aplikacji!)</string>
-    <string name="error_media_buttons">Coś poszło nie tak! :( Proszę uruchomić ponownie odtwarzanie w aplikacji</string>
     <string name="error_no_browser">Nie znaleziono przeglądarki!</string>
     <string name="error_bad_id">Najpierw coś odtwórz!</string>
     <string name="error_no_queue">Brak utworów w kolejce!</string>
@@ -48,7 +47,6 @@
     <string name="theme_pref_auto_title">Automatyczny</string>
     <string name="accent_pref_title">Odcień koloru</string>
     <string name="active_fragments_pref_title">Aktywuj zakładki</string>
-    <string name="active_fragments_pref_warning">Po prostu nie możesz usunąć wszystkich zakładek! :P</string>
     <string name="precise_volume_pref_title">Dokładna kontrola głośności</string>
     <string name="focus_pref_title">Wyciszanie otoczenia</string>
     <string name="headset_pref_title">Podłączanie słuchawek</string>
@@ -80,13 +78,11 @@
     <string name="playback_pref_summary_on">Utrzymuj wybraną prędkość odtwarzania</string>
     <string name="sorting_pref_artist">Artyści A-Z</string>
     <string name="delete">Usuń</string>
-    <string name="error_eq">Ups, nastąpił błąd!</string>
     <string name="on_list_ended_pref_title">Gdy lista się skończy…</string>
     <string name="favorites_save_time">Zapisz pozycję utworu</string>
     <string name="sorting_pref_date_added">Od najnowszej</string>
     <string name="sorting_pref_date_added_inv">Od najstarszej</string>
     <string name="sorting_pref_artist_inv">Artyści Z-A</string>
-    <string name="eq_pref_note_summary">Notka: Systemowa korekta będzie używana dopóki nie wyłączysz aplikacjy \"system equalizer (systemowa korekta)\" w ustawieniach systemowych</string>
     <string name="anim_pref_title">Animacje</string>
     <string name="playback_pref_title">Prędkość odtwarzania</string>
 </resources>

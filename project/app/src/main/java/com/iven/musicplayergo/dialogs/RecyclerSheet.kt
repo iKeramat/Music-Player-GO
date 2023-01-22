@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,9 +16,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.databinding.ModalRvBinding
-import com.iven.musicplayergo.extensions.applyFullHeightDialog
-import com.iven.musicplayergo.extensions.handleViewVisibility
+import com.iven.musicplayergo.databinding.SleeptimerItemBinding
+import com.iven.musicplayergo.extensions.*
 import com.iven.musicplayergo.models.Music
+import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.preferences.AccentsAdapter
 import com.iven.musicplayergo.preferences.ActiveTabsAdapter
 import com.iven.musicplayergo.preferences.FiltersAdapter
@@ -46,7 +46,11 @@ class RecyclerSheet: BottomSheetDialogFragment() {
     var onQueueCancelled: (() -> Unit)? = null
     var onFavoritesDialogCancelled: (() -> Unit)? = null
     var onSleepTimerDialogCancelled: (() -> Unit)? = null
-    var onSleepTimerEnabled: ((Boolean) -> Unit)? = null
+    var onSleepTimerEnabled: ((Boolean, String) -> Unit)? = null
+
+    private val mMediaPlayerHolder get() = MediaPlayerHolder.getInstance()
+
+    private val mGoPreferences get() = GoPreferences.getPrefsInstance()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -86,7 +90,8 @@ class RecyclerSheet: BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dialog.applyFullHeightDialog(requireActivity())
+        dialog?.disableShapeAnimation()
+        dialog?.applyFullHeightDialog(requireActivity())
 
         var dialogTitle = getString(R.string.accent_pref_title)
 
@@ -98,17 +103,15 @@ class RecyclerSheet: BottomSheetDialogFragment() {
 
                     sleepTimerElapsed.handleViewVisibility(show = false)
 
-                    modalRv.setHasFixedSize(true)
-                    val accentsAdapter = AccentsAdapter(requireActivity())
+                    val accentsAdapter = AccentsAdapter(resources.getIntArray(R.array.colors))
                     val layoutManager =  LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+
                     modalRv.layoutManager = layoutManager
                     modalRv.adapter = accentsAdapter
+                    modalRv.setHasFixedSize(true)
 
                     modalRv.post {
-                        layoutManager.scrollToPositionWithOffset(
-                            GoPreferences.getPrefsInstance().accent,
-                            0
-                        )
+                        layoutManager.scrollToPositionWithOffset(mGoPreferences.accent, 0)
                     }
 
                     // set listeners for buttons
@@ -116,7 +119,7 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                         dismiss()
                     }
                     btnPositive.setOnClickListener {
-                        GoPreferences.getPrefsInstance().accent = accentsAdapter.selectedAccent
+                        mGoPreferences.accent = accentsAdapter.selectedAccent
                         mUIControlInterface.onAppearanceChanged(isThemeChanged = false)
                     }
                 }
@@ -127,9 +130,9 @@ class RecyclerSheet: BottomSheetDialogFragment() {
 
                     sleepTimerElapsed.handleViewVisibility(show = false)
 
-                    modalRv.setHasFixedSize(true)
-                    val activeTabsAdapter = ActiveTabsAdapter(requireActivity())
+                    val activeTabsAdapter = ActiveTabsAdapter()
                     modalRv.adapter = activeTabsAdapter
+                    modalRv.setHasFixedSize(true)
 
                     val touchHelper = ItemTouchHelper(ItemTouchCallback(activeTabsAdapter.availableItems, isActiveTabs = true))
                     touchHelper.attachToRecyclerView(modalRv)
@@ -139,12 +142,12 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                     }
                     btnPositive.setOnClickListener {
                         val updatedItems = activeTabsAdapter.getUpdatedItems()
-                        if (GoPreferences.getPrefsInstance().activeTabs != updatedItems) {
-                            GoPreferences.getPrefsInstance().activeTabs = updatedItems
+                        updatedItems.takeIf { it != mGoPreferences.activeTabs}?.let { updatedList ->
+                            mGoPreferences.activeTabs = updatedList
                             mUIControlInterface.onAppearanceChanged(isThemeChanged = false)
-                        } else {
-                            dismiss()
+                            return@setOnClickListener
                         }
+                        dismiss()
                     }
                 }
 
@@ -154,9 +157,9 @@ class RecyclerSheet: BottomSheetDialogFragment() {
 
                     dialogTitle = getString(R.string.filter_pref_title)
 
-                    modalRv.setHasFixedSize(true)
-                    val filtersAdapter = FiltersAdapter(requireActivity())
+                    val filtersAdapter = FiltersAdapter()
                     modalRv.adapter = filtersAdapter
+                    modalRv.setHasFixedSize(true)
 
                     bottomDivider.handleViewVisibility(show = true)
                     btnDelete.handleViewVisibility(show = true)
@@ -169,12 +172,12 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                     }
                     btnPositive.setOnClickListener {
                         val updatedItems = filtersAdapter.getUpdatedItems()
-                        if (GoPreferences.getPrefsInstance().filters != updatedItems) {
-                            GoPreferences.getPrefsInstance().filters = updatedItems
+                        updatedItems.takeIf { it != mGoPreferences.filters}?.let { updatedList ->
+                            mGoPreferences.filters = updatedList
                             mUIControlInterface.onAppearanceChanged(isThemeChanged = false)
-                        } else {
-                            dismiss()
+                            return@setOnClickListener
                         }
+                        dismiss()
                     }
                 }
 
@@ -188,22 +191,18 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                     bottomDivider.handleViewVisibility(show = true)
                     btnDelete.handleViewVisibility(show = true)
                     btnDelete.setOnClickListener {
-                        mMediaControlInterface.onGetMediaPlayerHolder()?.let { mph ->
-                            Dialogs.showClearQueueDialog(requireContext(), mph)
-                        }
+                        Dialogs.showClearQueueDialog(requireContext())
                     }
 
-                    setRecyclerViewProps(modalRv)
+                    modalRv.disableScrollbars()
 
                     FastScrollerBuilder(modalRv).useMd2Style().build()
 
-                    mMediaControlInterface.onGetMediaPlayerHolder()?.run {
+                    with(mMediaPlayerHolder) {
 
-                        mQueueAdapter = QueueAdapter(requireActivity(), this)
+                        mQueueAdapter = QueueAdapter()
                         modalRv.adapter = mQueueAdapter
-                        if (Theming.isDeviceLand(resources)) {
-                            modalRv.layoutManager = GridLayoutManager(context, 3)
-                        }
+                        if (Theming.isDeviceLand(resources)) modalRv.layoutManager = GridLayoutManager(context, 3)
 
                         mQueueAdapter.onQueueCleared = {
                             dismiss()
@@ -211,15 +210,18 @@ class RecyclerSheet: BottomSheetDialogFragment() {
 
                         ItemTouchHelper(ItemTouchCallback(mQueueAdapter.queueSongs, isActiveTabs = false))
                             .attachToRecyclerView(modalRv)
-                        ItemTouchHelper(ItemSwipeCallback(requireActivity(), isQueueDialog = true, isFavoritesDialog = false) { viewHolder: RecyclerView.ViewHolder, _: Int ->
-                            if (!mQueueAdapter.performQueueSongDeletion(viewHolder.absoluteAdapterPosition)) {
+                        ItemTouchHelper(ItemSwipeCallback(isQueueDialog = true, isFavoritesDialog = false) { viewHolder: RecyclerView.ViewHolder, _: Int ->
+                            if (!mQueueAdapter.performQueueSongDeletion(
+                                    requireActivity(),
+                                    viewHolder.absoluteAdapterPosition)
+                            ) {
                                 mQueueAdapter.notifyItemChanged(viewHolder.absoluteAdapterPosition)
                             }
                         }).attachToRecyclerView(modalRv)
 
                         modalRv.post {
                             if (isQueueStarted) {
-                                val indexOfCurrentSong = queueSongs.indexOf(currentSong)
+                                val indexOfCurrentSong = queueSongs.findIndex(currentSong)
                                 val layoutManager = modalRv.layoutManager as LinearLayoutManager
                                 layoutManager.scrollToPositionWithOffset(indexOfCurrentSong, 0)
                             }
@@ -232,18 +234,19 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                     dialogTitle = getString(R.string.sleeptimer)
 
                     val sleepTimerAdapter = SleepTimerAdapter()
-                    modalRv.setHasFixedSize(true)
                     modalRv.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
                     modalRv.adapter = sleepTimerAdapter
+                    modalRv.setHasFixedSize(true)
+
                     sleepTimerElapsed.handleViewVisibility(show = false)
 
                     btnNegative.setOnClickListener {
                         dismiss()
                     }
                     btnPositive.setOnClickListener {
-                        mMediaControlInterface.onGetMediaPlayerHolder()?.run {
-                            val isEnabled = pauseBySleepTimer(sleepTimerAdapter.getSelectedSleepTimerValue(), sleepTimerAdapter.getSelectedSleepTimer())
-                            onSleepTimerEnabled?.invoke(isEnabled)
+                        with(mMediaPlayerHolder) {
+                            val isEnabled = pauseBySleepTimer(sleepTimerAdapter.getSelectedSleepTimerValue())
+                            onSleepTimerEnabled?.invoke(isEnabled, sleepTimerAdapter.getSelectedSleepTimer())
                         }
                         dismiss()
                     }
@@ -263,8 +266,8 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                         text = getString(R.string.sleeptimer_stop)
                         contentDescription = getString(R.string.sleeptimer_cancel_desc)
                         setOnClickListener {
-                            mMediaControlInterface.onGetMediaPlayerHolder()?.cancelSleepTimer()
-                            onSleepTimerEnabled?.invoke(false)
+                            mMediaPlayerHolder.cancelSleepTimer()
+                            onSleepTimerEnabled?.invoke(false, "")
                             dismiss()
                         }
                     }
@@ -277,17 +280,18 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                     sleepTimerElapsed.handleViewVisibility(show = false)
 
                     modalRv.setHasFixedSize(true)
-                    val notificationActionsAdapter = NotificationActionsAdapter(requireContext(), mMediaControlInterface.onGetMediaPlayerHolder())
+                    val notificationActionsAdapter = NotificationActionsAdapter()
                     val layoutManager =  LinearLayoutManager(requireActivity())
                     modalRv.layoutManager = layoutManager
                     modalRv.adapter = notificationActionsAdapter
+                    modalRv.setHasFixedSize(true)
 
                     // set listeners for buttons
                     btnNegative.setOnClickListener {
                         dismiss()
                     }
                     btnPositive.setOnClickListener {
-                        mMediaControlInterface.onGetMediaPlayerHolder()?.onHandleNotificationUpdate(
+                        mMediaPlayerHolder.onHandleNotificationUpdate(
                             isAdditionalActionsChanged = true
                         )
                         dismiss()
@@ -308,29 +312,41 @@ class RecyclerSheet: BottomSheetDialogFragment() {
                         Dialogs.showClearFavoritesDialog(requireActivity())
                     }
 
-                    setRecyclerViewProps(modalRv)
-                    val favoritesAdapter = FavoritesAdapter(requireActivity())
+                    modalRv.disableScrollbars()
+                    val favoritesAdapter = FavoritesAdapter()
                     modalRv.adapter = favoritesAdapter
                     FastScrollerBuilder(modalRv).useMd2Style().build()
 
                     if (Theming.isDeviceLand(resources)) {
                         modalRv.layoutManager = GridLayoutManager(context, 3)
                     }
-                    favoritesAdapter.onFavoritesCleared = {
-                        dismiss()
+
+                    with(favoritesAdapter) {
+                        onFavoritesCleared = {
+                            dismiss()
+                        }
+                        onFavoritesUpdate = {
+                            mUIControlInterface.onFavoritesUpdated(clear = false)
+                            mUIControlInterface.onFavoriteAddedOrRemoved()
+                        }
+                        onFavoriteQueued = { favoriteToQueue ->
+                            mMediaControlInterface.onAddToQueue(favoriteToQueue)
+                        }
+                        onFavoritesQueued = { favorites, forcePlay ->
+                            mMediaControlInterface.onAddAlbumToQueue(favorites, forcePlay = forcePlay)
+                        }
                     }
 
-                    ItemTouchHelper(ItemSwipeCallback(requireActivity(),
-                        isQueueDialog = false, isFavoritesDialog = true) {
+                    ItemTouchHelper(ItemSwipeCallback(isQueueDialog = false, isFavoritesDialog = true) {
                             viewHolder: RecyclerView.ViewHolder,
                             direction: Int ->
                         val index = viewHolder.absoluteAdapterPosition
-                        if (direction == ItemTouchHelper.RIGHT) {
-                            mMediaControlInterface.onAddToQueue(GoPreferences.getPrefsInstance().favorites?.get(index))
-                        } else {
-                            favoritesAdapter.performFavoriteDeletion(index)
-                        }
                         favoritesAdapter.notifyItemChanged(index)
+                        if (direction == ItemTouchHelper.RIGHT) {
+                            mMediaControlInterface.onAddToQueue(mGoPreferences.favorites?.get(index))
+                            return@ItemSwipeCallback
+                        }
+                        favoritesAdapter.performFavoriteDeletion(requireActivity(), index)
                     }).attachToRecyclerView(modalRv)
                 }
             }
@@ -339,16 +355,8 @@ class RecyclerSheet: BottomSheetDialogFragment() {
         }
     }
 
-    private fun setRecyclerViewProps(rv: RecyclerView) {
-        rv.isVerticalScrollBarEnabled = false
-        rv.isHorizontalScrollBarEnabled = false
-        rv.setHasFixedSize(true)
-    }
-
     fun swapQueueSong(song: Music?) {
-        if (::mQueueAdapter.isInitialized) {
-            mQueueAdapter.swapSelectedSong(song)
-        }
+        if (::mQueueAdapter.isInitialized) mQueueAdapter.swapSelectedSong(song)
     }
 
     fun updateCountdown(value: String) {
@@ -368,13 +376,10 @@ class RecyclerSheet: BottomSheetDialogFragment() {
         fun getSelectedSleepTimer(): String = sleepOptions[mSelectedPosition]
         fun getSelectedSleepTimerValue() = sleepOptionValues[mSelectedPosition].toLong()
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SleepTimerHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.sleeptimer_item,
-                parent,
-                false
-            )
-        )
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepTimerHolder {
+            val binding = SleeptimerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return SleepTimerHolder(binding)
+        }
 
         override fun getItemCount(): Int {
             return sleepOptions.size
@@ -384,11 +389,11 @@ class RecyclerSheet: BottomSheetDialogFragment() {
             holder.bindItems(sleepOptions[holder.absoluteAdapterPosition])
         }
 
-        inner class SleepTimerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class SleepTimerHolder(private val binding: SleeptimerItemBinding): RecyclerView.ViewHolder(binding.root) {
 
             fun bindItems(itemSleepOption: String) {
 
-                with(itemView as TextView) {
+                with(binding.root) {
                     text = itemSleepOption
                     contentDescription = itemSleepOption
                     setTextColor(if (mSelectedPosition == absoluteAdapterPosition) {

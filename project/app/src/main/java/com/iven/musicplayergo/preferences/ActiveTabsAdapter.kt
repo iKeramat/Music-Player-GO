@@ -2,7 +2,6 @@ package com.iven.musicplayergo.preferences
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,31 +9,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.iven.musicplayergo.GoConstants
 import com.iven.musicplayergo.GoPreferences
 import com.iven.musicplayergo.R
-import com.iven.musicplayergo.extensions.toToast
+import com.iven.musicplayergo.databinding.ActiveTabItemBinding
 import com.iven.musicplayergo.extensions.updateIconTint
 import com.iven.musicplayergo.utils.Theming
 
 
-class ActiveTabsAdapter(private val ctx: Context) :
-    RecyclerView.Adapter<ActiveTabsAdapter.CheckableItemsHolder>() {
+class ActiveTabsAdapter: RecyclerView.Adapter<ActiveTabsAdapter.CheckableItemsHolder>() {
 
     var availableItems = GoPreferences.getPrefsInstance().activeTabsDef.toMutableList()
     private val mActiveItems = GoPreferences.getPrefsInstance().activeTabs.toMutableList()
-
-    private val mDisabledColor = Theming.resolveWidgetsColorNormal(ctx)
-    private val mDefaultTextColor = Theming.resolveColorAttr(ctx, android.R.attr.textColorPrimary)
 
     fun getUpdatedItems() = availableItems.apply {
         GoPreferences.getPrefsInstance().activeTabsDef = this
     }.minus(availableItems.minus(mActiveItems.toSet()).toSet()) /*make sure to respect tabs order*/
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CheckableItemsHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.active_tab_item,
-            parent,
-            false
-        )
-    )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheckableItemsHolder {
+        val binding = ActiveTabItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CheckableItemsHolder(binding)
+    }
 
     override fun getItemCount() = availableItems.size
 
@@ -42,55 +34,52 @@ class ActiveTabsAdapter(private val ctx: Context) :
         holder.bindItems()
     }
 
-    inner class CheckableItemsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CheckableItemsHolder(private val binding: ActiveTabItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bindItems() {
 
-            with(itemView) {
+            with(binding) {
 
-                val tabDragHandle = findViewById<ImageView>(R.id.tab_drag_handle)
+                val context = root.context
+                val disabledColor = Theming.resolveWidgetsColorNormal(context)
+                tabText.text = context.getString(getTabText(availableItems[absoluteAdapterPosition]))
 
-                val tabText = findViewById<TextView>(R.id.tab_text)
-                tabText.text = ctx.getString(getTabText(availableItems[absoluteAdapterPosition]))
+                tabImage.setImageResource(Theming.getTabIcon(availableItems[absoluteAdapterPosition]))
 
-                val tabImageButton = findViewById<ImageView>(R.id.tab_image)
-                tabImageButton.setImageResource(Theming.getTabIcon(availableItems[absoluteAdapterPosition]))
+                root.isEnabled = availableItems[absoluteAdapterPosition] != GoConstants.SETTINGS_TAB
+                root.isClickable = root.isEnabled
 
-                isEnabled = availableItems[absoluteAdapterPosition] != GoConstants.SETTINGS_TAB
-                isClickable = isEnabled
-
-                if (isEnabled) {
+                if (root.isEnabled) {
                     manageTabStatus(
+                        context,
                         selected = mActiveItems.contains(availableItems[absoluteAdapterPosition]),
                         tabDragHandle,
                         tabText,
-                        tabImageButton
+                        tabImage
                     )
                 } else {
-                    tabDragHandle.updateIconTint(mDisabledColor)
-                    tabText.setTextColor(mDisabledColor)
-                    tabImageButton.updateIconTint(mDisabledColor)
+                    tabDragHandle.updateIconTint(disabledColor)
+                    tabText.setTextColor(disabledColor)
+                    tabImage.updateIconTint(disabledColor)
                 }
 
-                setOnClickListener {
+                root.setOnClickListener {
 
-                    manageTabStatus(
-                        selected = !tabImageButton.isSelected,
+                    manageTabStatus(context, selected = !tabImage.isSelected,
                         tabDragHandle,
                         tabText,
-                        tabImageButton
+                        tabImage
                     )
 
                     val toggledItem = availableItems[absoluteAdapterPosition]
-                    if (!tabImageButton.isSelected) {
+                    if (!tabImage.isSelected) {
                         mActiveItems.remove(toggledItem)
                     } else {
                         mActiveItems.add(toggledItem)
                     }
                     if (mActiveItems.size < 2) {
-                        R.string.active_fragments_pref_warning.toToast(context)
                         mActiveItems.add(toggledItem)
-                        manageTabStatus(selected = true, tabDragHandle, tabText, tabImageButton)
+                        manageTabStatus(context, selected = true, tabDragHandle, tabText, tabImage)
                     }
                 }
             }
@@ -98,21 +87,19 @@ class ActiveTabsAdapter(private val ctx: Context) :
     }
 
     private fun manageTabStatus(
+        context: Context,
         selected: Boolean,
         dragHandle: ImageView,
         textView: TextView,
         icon: ImageView
     ) {
+        val disabledColor = Theming.resolveWidgetsColorNormal(context)
         icon.isSelected = selected
-        val iconColor = if (selected) {
-            Theming.resolveThemeColor(icon.resources)
-        } else {
-            mDisabledColor
-        }
+        val iconColor = if (selected) Theming.resolveThemeColor(icon.resources) else disabledColor
         val textColor = if (selected) {
-            mDefaultTextColor
+            Theming.resolveColorAttr(context, android.R.attr.textColorPrimary)
         } else {
-            mDisabledColor
+            disabledColor
         }
         dragHandle.updateIconTint(textColor)
         textView.setTextColor(textColor)

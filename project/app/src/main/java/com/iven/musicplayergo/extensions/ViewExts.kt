@@ -5,26 +5,23 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.drawable.InsetDrawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.WindowInsetsCompat
@@ -36,28 +33,17 @@ import androidx.fragment.app.commit
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import androidx.window.layout.WindowMetricsCalculator
 import coil.load
 import com.google.android.material.animation.ArgbEvaluatorCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.iven.musicplayergo.R
 import com.iven.musicplayergo.ui.SingleClickHelper
 import com.iven.musicplayergo.utils.Theming
 import kotlin.math.max
 
-
-// viewTreeObserver extension to measure layout params
-// https://antonioleiva.com/kotlin-ongloballayoutlistener/
-inline fun <T : View> T.afterMeasured(crossinline f: T.() -> Unit) {
-    viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-        override fun onGlobalLayout() {
-            if (measuredWidth > 0 && measuredHeight > 0) {
-                viewTreeObserver.removeOnGlobalLayoutListener(this)
-                f()
-            }
-        }
-    })
-}
 
 fun View.applyEdgeToEdge() {
     setOnApplyWindowInsetsListener { view, insets ->
@@ -72,10 +58,10 @@ fun ImageView.loadWithError(bitmap: Bitmap?, error: Boolean, albumArt: Int) {
     if (error) {
         scaleType = ImageView.ScaleType.CENTER_INSIDE
         load(ContextCompat.getDrawable(context, albumArt)?.toBitmap())
-    } else {
-        scaleType = ImageView.ScaleType.CENTER_CROP
-        load(bitmap)
+        return
     }
+    scaleType = ImageView.ScaleType.CENTER_CROP
+    load(bitmap)
 }
 
 // https://stackoverflow.com/a/38241603
@@ -99,9 +85,11 @@ fun MenuItem.setTitleColor(color: Int) {
 
 // Extension to set menu items icon color
 fun MenuItem.setIconTint(color: Int) {
-    val wrapped = DrawableCompat.wrap(icon)
-    DrawableCompat.setTint(wrapped, color)
-    icon = wrapped
+    icon?.let { dw ->
+        val wrapped = DrawableCompat.wrap(dw)
+        DrawableCompat.setTint(wrapped, color)
+        icon = wrapped
+    }
 }
 
 // Extension to set span to menu title
@@ -119,8 +107,8 @@ fun MenuItem.setTitle(resources: Resources, title: String?) {
 }
 
 @SuppressLint("RestrictedApi")
-fun Menu.enablePopupIcons(activity: Activity) {
-    val iconMarginPx = activity.resources.getDimensionPixelSize(R.dimen.player_controls_padding_start)
+fun Menu.enablePopupIcons(resources: Resources) {
+    val iconMarginPx = resources.getDimensionPixelSize(R.dimen.player_controls_padding_start)
 
     if (this is MenuBuilder) {
         setOptionalIconsVisible(true)
@@ -139,23 +127,19 @@ fun FragmentManager.addFragment(fragment: Fragment?, tag: String?) {
     fragment?.let { fm ->
         commit {
             addToBackStack(null)
-            add(
-                R.id.container,
-                fm,
-                tag
-            )
+            add(R.id.container, fm, tag)
         }
     }
 }
 
 fun FragmentManager.goBackFromFragmentNow(fragment: Fragment?) {
-    if (backStackEntryCount >= 0) {
-        commit {
-            fragment?.run {
-                remove(this)
+    if (backStackEntryCount > 0) {
+        fragment?.let { fm ->
+            commit {
+                remove(fm)
             }
-            popBackStackImmediate()
         }
+        popBackStackImmediate()
     }
 }
 
@@ -168,32 +152,19 @@ fun View.createCircularReveal(show: Boolean): Animator {
 
     val revealDuration = 500L
     val radius = max(width, height).toFloat()
-
-    val startRadius = if (show) {
-        0f
-    } else {
-        radius
-    }
-    val finalRadius = if (show) {
-        radius
-    } else {
-        0f
+    var startRadius = radius
+    var finalRadius = 0F
+    if (show) {
+        startRadius = 0F
+        finalRadius = radius
     }
 
-    val animator =
-        ViewAnimationUtils.createCircularReveal(
-            this,
-            0,
-            0,
-            startRadius,
-            finalRadius
-        ).apply {
+    val animator = ViewAnimationUtils.createCircularReveal(this, 0, 0,
+        startRadius, finalRadius).apply {
             interpolator = FastOutSlowInInterpolator()
             duration = revealDuration
             doOnEnd {
-                if (!show) {
-                    handleViewVisibility(show = false)
-                }
+                if (!show) handleViewVisibility(show = false)
             }
             start()
         }
@@ -213,18 +184,11 @@ fun View.createCircularReveal(show: Boolean): Animator {
 // https://stackoverflow.com/a/53986874
 fun RecyclerView.smoothSnapToPosition(position: Int) {
     val smoothScroller = object : LinearSmoothScroller(context) {
-        override fun getVerticalSnapPreference(): Int {
-            return SNAP_TO_START
-        }
-
-        override fun getHorizontalSnapPreference(): Int {
-            return SNAP_TO_START
-        }
-
+        override fun getVerticalSnapPreference() = SNAP_TO_START
+        override fun getHorizontalSnapPreference() = SNAP_TO_START
         override fun onStop() {
             super.onStop()
-            findViewHolderForAdapterPosition(position)
-                ?.itemView?.performClick()
+            findViewHolderForAdapterPosition(position)?.itemView?.performClick()
         }
     }
     smoothScroller.targetPosition = position
@@ -232,35 +196,17 @@ fun RecyclerView.smoothSnapToPosition(position: Int) {
 }
 
 fun View.handleViewVisibility(show: Boolean) {
-    visibility = if (show) {
-        View.VISIBLE
-    } else {
-        View.GONE
-    }
-}
-
-fun String.toToast(context: Context) {
-    Toast.makeText(context, this, Toast.LENGTH_SHORT).show()
-}
-
-fun Int.toToast(context: Context) {
-    Toast.makeText(context, this, Toast.LENGTH_SHORT).show()
+    visibility = if (show) View.VISIBLE else View.GONE
 }
 
 fun View.safeClickListener(safeClickListener: (view: View) -> Unit) {
-    this.setOnClickListener {
-        if (!SingleClickHelper.isBlockingClick()) {
-            safeClickListener(it)
-        }
+    setOnClickListener {
+        if (!SingleClickHelper.isBlockingClick()) safeClickListener(it)
     }
 }
 
-fun Int.toContrastColor() = if (ColorUtils.calculateLuminance(this) < 0.35) Color.WHITE else Color.DKGRAY
-
 fun ImageView.updateIconTint(tint: Int) {
-    ImageViewCompat.setImageTintList(
-        this, ColorStateList.valueOf(tint)
-    )
+    ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(tint))
 }
 
 
@@ -273,4 +219,42 @@ fun Dialog?.applyFullHeightDialog(activity: Activity) {
     this?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let { bs ->
         BottomSheetBehavior.from(bs).peekHeight = height
     }
+}
+
+fun ViewPager2.reduceDragSensitivity() {
+
+    // By default, ViewPager2's sensitivity is high enough to result in vertical
+    // scroll events being registered as horizontal scroll events. Reflect into the
+    // internal recyclerview and change the touch slope so that touch actions will
+    // act more as a scroll than as a swipe.
+    try {
+
+        val recycler = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+        recycler.isAccessible = true
+        val recyclerView = recycler.get(this) as RecyclerView
+
+        val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
+        touchSlopField.isAccessible = true
+        val touchSlop = touchSlopField.get(recyclerView) as Int
+        touchSlopField.set(recyclerView, touchSlop*3) // 3x seems to be the best fit here
+
+    } catch (e: Exception) {
+        Log.e("MainActivity", "Unable to reduce ViewPager sensitivity")
+        Log.e("MainActivity", e.stackTraceToString())
+    }
+}
+
+@SuppressLint("RestrictedApi", "VisibleForTests")
+fun Dialog?.disableShapeAnimation() {
+    try {
+        val bottomSheetDialog = this as BottomSheetDialog
+        bottomSheetDialog.behavior.disableShapeAnimations()
+    } catch (ex: Exception) {
+        Log.e("BaseBottomSheet", "disableShapeAnimation Exception:", ex)
+    }
+}
+
+fun RecyclerView.disableScrollbars() {
+    isVerticalScrollBarEnabled = false
+    isHorizontalScrollBarEnabled = false
 }

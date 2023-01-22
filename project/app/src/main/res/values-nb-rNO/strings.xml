@@ -29,10 +29,11 @@
     <string name="error_no_music">Fant ingen musikk :(</string>
     <string name="error_not_ready">Kunne ikke laste inn musikkbiblioteket! :( Dette kan skyldes at SD-kortet blir montert, og tvinger Android\'s MediaStore til å gjenopprette databaseoppføringene. Løsning: prøv igjen senere.</string>
     <string name="error_unknown_unsupported">Noe gikk galt! :( Kanskje støttes ikke det valgte formatet, eller mappen er utilgjengelig (ikke programmets feil!).</string>
-    <string name="error_media_buttons">Noe gikk galt! :( Start avspillingen på nytt fra programmet.</string>
     <string name="error_no_browser">Fant ingen nettlesere.</string>
     <string name="error_bad_id">Spill en spor først.</string>
     <string name="error_no_queue">Ingen spor i kø.</string>
+    <string name="error_fs_not_allowed_sum">Feil. Skru av batterioptimisering for MPGO</string>
+    <string name="error_fs_not_allowed">Noe gikk galt. :( Overvei å skru av batterioptimalisering i systeminnstillinger: Programmer &gt; Alle programmer &gt; Music Player Go &gt; Batteri &gt; Ubegrenset siden det kan forårsake at avspillertjenesten stopper.</string>
     <string name="perm_rationale">Music Player GO trenger tilgang til filene dine for å spille musikk.</string>
     <string name="repeat_enabled">Enkel gjentagelse på.</string>
     <string name="repeat_loop_enabled">∞ gjentagelse på.</string>
@@ -46,7 +47,6 @@
     <string name="theme_pref_auto_title">Automatisk</string>
     <string name="accent_pref_title">Aksent</string>
     <string name="active_fragments_pref_title">Aktive faner</string>
-    <string name="active_fragments_pref_warning">Du kan ikke bare fjerne alle fanene! :P</string>
     <string name="precise_volume_pref_title">Presis lydstyrkekontroll</string>
     <string name="focus_pref_title">Lydfokus</string>
     <string name="headset_pref_title">Hodetelefonkontakt</string>
@@ -58,12 +58,10 @@
     <string name="on_list_ended_pref_stop_title">Stopp</string>
     <string name="on_list_ended_pref_continue_title">Fortsett</string>
     <string name="song_visual_pref_title">Sporvirtualisering</string>
-    <string name="eq_pref_note_summary">Merk: Systemtonekontroll foretrekkes. Hvis du ønsker å bruke den innebygde, skru av programmet systemtonekontroll fra innstillingene. :)</string>
     <string name="fast_seeking_pref_title">Rask blafring</string>
     <string name="notification_actions_repeat">Ytterligere merknadshandlinger</string>
     <string name="song_visual_pref_fn_title">Filnavn</string>
     <string name="song_visual_pref_tl_title">Tittel</string>
-    <string name="error_eq">Oida, en feil inntraff.</string>
     <string name="equalizer_v">Kringlyd</string>
     <string name="equalizer_bb">Bassforsterking</string>
     <string name="equalizer">Tonekontroll</string>
@@ -89,8 +87,6 @@
     <string name="sorting_pref_date_added">Nyeste dato først</string>
     <string name="pause_on_end">Pause ved fullførelse på.</string>
     <string name="pause_on_end_disabled">Pause ved fullførelse av.</string>
-    <string name="error_fs_not_allowed_sum">Feil. Skru av batterioptimisering for MPGO</string>
-    <string name="error_fs_not_allowed">Noe gikk galt. :( Overvei å skru av batterioptimalisering i systeminnstillinger: Programmer &gt; Alle programmer &gt; Music Player Go &gt; Batteri &gt; Ubegrenset siden det kan forårsake at avspillertjenesten stopper.</string>
     <string name="pink">Rosa</string>
     <string name="cyan">Cyanblå</string>
     <string name="teal">Mørk grønnblå</string>
@@ -168,4 +164,21 @@
     <string name="continue_on_end_desc">Velg hvorvidt du vil forsette avspilling eller sette på pause ved fullføring</string>
     <string name="filters_clear">Tøm filtre og fortsett\?</string>
     <string name="confirm_ask_pref_sum">Spør om bekreftelse før noe gjøres</string>
+    <string name="filters_error">Kunne ikke åpne skjulte artister/mapper/album.</string>
+    <string name="eq_pref_sum">Påtving bruk av innebygd tonekontroll</string>
+    <string name="category_audio">Lyd</string>
+    <string name="category_ui">Grensesnitt</string>
+    <string name="eq_pref_title">Innebygd tonekontroll</string>
+    <string name="error_builtin_eq">En feil oppstod. Bruk systemets tonekontroll (hvis den forefinnes).</string>
+    <string name="error_sys_eq">Systemtonekontroll er ikke tilgjengelig.</string>
+    <string name="locale_finnish">Finsk</string>
+    <string name="rotation_pref_title">Lås sideretning</string>
+    <string name="sorting_pref_reset_sum">For alle album og mapper</string>
+    <string name="sorting_pref_reset_neutral">Slutt å spørre</string>
+    <string name="sorting_pref_reset_confirm">Tilbakestill sorteringsinnstillinger\?</string>
+    <string name="sorting_pref_reset">Tilbakestill sporrekkefølge</string>
+    <string name="sorting_pref_save">Bruk som forvalgt sortering\?</string>
+    <string name="locale_punjabi">Punjabi</string>
+    <string name="locale_azerbaijani">Aserbajdsjansk</string>
+    <string name="locale_malayalam">Malayalam</string>
 </resources>

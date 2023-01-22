@@ -11,6 +11,7 @@ import com.iven.musicplayergo.extensions.enablePopupIcons
 import com.iven.musicplayergo.extensions.setTitle
 import com.iven.musicplayergo.extensions.setTitleColor
 import com.iven.musicplayergo.models.Music
+import com.iven.musicplayergo.player.MediaPlayerHolder
 import com.iven.musicplayergo.ui.MediaControlInterface
 import com.iven.musicplayergo.ui.UIControlInterface
 
@@ -31,7 +32,7 @@ object Popups {
                 inflate(R.menu.popup_songs)
 
                 menu.findItem(R.id.song_title).setTitle(activity.resources, song?.title)
-                menu.enablePopupIcons(activity)
+                menu.enablePopupIcons(activity.resources)
                 gravity = Gravity.END
 
                 setOnMenuItemClickListener { menuItem ->
@@ -56,10 +57,7 @@ object Popups {
     }
 
     @JvmStatic
-    fun showPopupForPlaybackSpeed(
-        activity: Activity,
-        view: View
-    ) {
+    fun showPopupForPlaybackSpeed(activity: Activity, view: View) {
 
         PopupMenu(activity, view).apply {
             inflate(R.menu.popup_speed)
@@ -86,12 +84,10 @@ object Popups {
                 }
                 if (GoPreferences.getPrefsInstance().playbackSpeedMode != GoConstants.PLAYBACK_SPEED_ONE_ONLY) {
                     menu.findItem(getSelectedPlaybackItem(playbackSpeed)).setTitleColor(
-                        Theming.resolveThemeColor(
-                            activity.resources
-                        )
+                        Theming.resolveThemeColor(activity.resources)
                     )
                 }
-                (activity as MediaControlInterface).onGetMediaPlayerHolder()?.setPlaybackSpeed(playbackSpeed)
+                MediaPlayerHolder.getInstance().setPlaybackSpeed(playbackSpeed)
                 return@setOnMenuItemClickListener true
             }
             show()

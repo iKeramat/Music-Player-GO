@@ -8,16 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.os.Parcelable
 import android.os.PowerManager
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.KeyEvent
 import androidx.core.content.getSystemService
 import com.iven.musicplayergo.GoConstants
 import com.iven.musicplayergo.GoPreferences
-import com.iven.musicplayergo.R
-import com.iven.musicplayergo.extensions.toSavedMusic
-import com.iven.musicplayergo.extensions.toToast
 import com.iven.musicplayergo.utils.Lists
 import com.iven.musicplayergo.utils.Versioning
 
@@ -38,39 +34,39 @@ class PlayerService : Service() {
     private lateinit var mWakeLock: PowerManager.WakeLock
 
     // Media player
-    lateinit var mediaPlayerHolder: MediaPlayerHolder
+    private val mMediaPlayerHolder get() = MediaPlayerHolder.getInstance()
     lateinit var musicNotificationManager: MusicNotificationManager
     var isRestoredFromPause = false
 
     var headsetClicks = 0
     private var mLastTimeClick = 0L
 
-    private lateinit var mMediaSessionCompat: MediaSessionCompat
+    private var mMediaSessionCompat: MediaSessionCompat? = null
 
     private val mMediaSessionCallback = object : MediaSessionCompat.Callback() {
 
         override fun onPlay() {
-            mediaPlayerHolder.resumeOrPause()
+            mMediaPlayerHolder.resumeOrPause()
         }
 
         override fun onPause() {
-            mediaPlayerHolder.resumeOrPause()
+            mMediaPlayerHolder.resumeOrPause()
         }
 
         override fun onSkipToNext() {
-            mediaPlayerHolder.skip(isNext = true)
+            mMediaPlayerHolder.skip(isNext = true)
         }
 
         override fun onSkipToPrevious() {
-            mediaPlayerHolder.skip(isNext = false)
+            mMediaPlayerHolder.skip(isNext = false)
         }
 
         override fun onStop() {
-            mediaPlayerHolder.stopPlaybackService(stopPlayback = true)
+            mMediaPlayerHolder.stopPlaybackService(stopPlayback = true, fromUser = true, fromFocus = false)
         }
 
         override fun onSeekTo(pos: Long) {
-            mediaPlayerHolder.seekTo(
+            mMediaPlayerHolder.seekTo(
                 pos.toInt(),
                 updatePlaybackStatus = true,
                 restoreProgressCallBack = false
@@ -85,11 +81,10 @@ class PlayerService : Service() {
         val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
         val mediaButtonReceiverComponentName = ComponentName(applicationContext, MediaBtnReceiver::class.java)
 
-        val mediaButtonReceiverPendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, if (Versioning.isMarshmallow()) {
-            PendingIntent.FLAG_IMMUTABLE or 0
-        } else {
-            0
-        })
+        var flags = 0
+        if (Versioning.isMarshmallow()) flags = PendingIntent.FLAG_IMMUTABLE or 0
+        val mediaButtonReceiverPendingIntent = PendingIntent.getBroadcast(applicationContext,
+            0, mediaButtonIntent, flags)
 
         mMediaSessionCompat = MediaSessionCompat(this, packageName, mediaButtonReceiverComponentName, mediaButtonReceiverPendingIntent).apply {
             isActive = true
@@ -98,39 +93,40 @@ class PlayerService : Service() {
         }
     }
 
-    fun getMediaSession(): MediaSessionCompat = mMediaSessionCompat
+    fun getMediaSession(): MediaSessionCompat? = mMediaSessionCompat
 
     override fun onDestroy() {
         super.onDestroy()
 
-        if (::mediaPlayerHolder.isInitialized && mediaPlayerHolder.isCurrentSong) {
+        if (mMediaPlayerHolder.isCurrentSong && mMediaPlayerHolder.currentSongFM == null) {
 
             // Saves last played song and its position if user is ok :)
-            val preferences = GoPreferences.getPrefsInstance()
-            with(mediaPlayerHolder) {
-                preferences.latestPlayedSong = if (isQueue != null && isQueueStarted) {
-                    preferences.isQueue = isQueue
-                    currentSong
+            val prefs = GoPreferences.getPrefsInstance()
+            with(mMediaPlayerHolder) {
+                if (queueSongs.isNotEmpty()) prefs.queue = queueSongs
+                prefs.latestPlayedSong = currentSong?.copy(startFrom = playerPosition, launchedBy = launchedBy)
+                if (isQueue != null && isQueueStarted) {
+                    prefs.isQueue = isQueue
                 } else {
-                    if (preferences.isQueue != null) { preferences.isQueue = null }
-                    currentSong?.toSavedMusic(playerPosition, launchedBy)
+                    if (prefs.isQueue != null) prefs.isQueue = null
                 }
-                if (queueSongs.isNotEmpty()) { preferences.queue = queueSongs }
             }
-            preferences.latestVolume = mediaPlayerHolder.currentVolumeInPercent
+            prefs.latestVolume = mMediaPlayerHolder.currentVolumeInPercent
         }
 
-        if (::mMediaSessionCompat.isInitialized && mMediaSessionCompat.isActive) {
-            with(mMediaSessionCompat) {
+        mMediaSessionCompat?.run {
+            if (isActive) {
                 isActive = false
                 setCallback(null)
                 setMediaButtonReceiver(null)
                 release()
             }
-            mediaPlayerHolder.release()
-            releaseWakeLock()
-            isRunning = false
         }
+
+        mMediaSessionCompat = null
+        mMediaPlayerHolder.release()
+        releaseWakeLock()
+        isRunning = false
     }
 
     override fun onCreate() {
@@ -152,7 +148,7 @@ class PlayerService : Service() {
         try {
             intent?.action?.let { act ->
 
-                with(mediaPlayerHolder) {
+                with(mMediaPlayerHolder) {
                     when (act) {
                         GoConstants.FAVORITE_ACTION -> {
                             Lists.addToFavorites(
@@ -163,7 +159,7 @@ class PlayerService : Service() {
                                 launchedBy
                             )
                             musicNotificationManager.updateFavoriteIcon()
-                            mediaPlayerHolder.mediaPlayerInterface.onUpdateFavorites()
+                            mMediaPlayerHolder.mediaPlayerInterface.onUpdateFavorites()
                         }
                         GoConstants.FAVORITE_POSITION_ACTION -> Lists.addToFavorites(
                             this@PlayerService,
@@ -182,7 +178,7 @@ class PlayerService : Service() {
                             mediaPlayerInterface.onUpdateRepeatStatus()
                         }
                         GoConstants.CLOSE_ACTION -> if (isRunning && isMediaPlayer) {
-                            stopPlaybackService(stopPlayback = true)
+                            stopPlaybackService(stopPlayback = true, fromUser = true, fromFocus = false)
                         }
                     }
                 }
@@ -194,13 +190,8 @@ class PlayerService : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder {
-
-        if (!::mediaPlayerHolder.isInitialized) {
-            mediaPlayerHolder = MediaPlayerHolder().apply {
-                synchronized(initializeNotificationManager()) {
-                    setMusicService(this@PlayerService)
-                }
-            }
+        synchronized(initializeNotificationManager()) {
+            mMediaPlayerHolder.setMusicService(this@PlayerService)
         }
         return binder
     }
@@ -212,28 +203,29 @@ class PlayerService : Service() {
     }
 
     fun acquireWakeLock() {
-        if (::mWakeLock.isInitialized && !mWakeLock.isHeld) {
-            mWakeLock.acquire(WAKELOCK_MILLI)
-        }
+        if (::mWakeLock.isInitialized && !mWakeLock.isHeld) mWakeLock.acquire(WAKELOCK_MILLI)
     }
 
     fun releaseWakeLock() {
-        if (::mWakeLock.isInitialized && mWakeLock.isHeld) {
-            mWakeLock.release()
-        }
+        if (::mWakeLock.isInitialized && mWakeLock.isHeld) mWakeLock.release()
     }
 
     inner class LocalBinder : Binder() {
         // Return this instance of PlayerService so we can call public methods
-        fun getService() : PlayerService = this@PlayerService
+        fun getService(): PlayerService = this@PlayerService
     }
 
+    @Suppress("DEPRECATION")
     fun handleMediaIntent(intent: Intent?): Boolean {
 
         try {
             intent?.let {
-                val event =
-                    intent.getParcelableExtra<Parcelable>(Intent.EXTRA_KEY_EVENT) as KeyEvent
+
+                val event = if (Versioning.isTiramisu()) {
+                    intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+                } else {
+                    intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+                } ?: return false
 
                 val eventTime =
                     if (event.eventTime != 0L) event.eventTime else System.currentTimeMillis()
@@ -242,38 +234,35 @@ class PlayerService : Service() {
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> {
                             // respond to double click
-                            if (eventTime - mLastTimeClick <= DOUBLE_CLICK) {
-                                headsetClicks = 2
-                            }
+                            if (eventTime - mLastTimeClick <= DOUBLE_CLICK) headsetClicks = 2
                             if (headsetClicks == 2) {
-                                mediaPlayerHolder.skip(isNext = true)
+                                mMediaPlayerHolder.skip(isNext = true)
                             } else {
-                                mediaPlayerHolder.resumeOrPause()
+                                mMediaPlayerHolder.resumeOrPause()
                             }
                             mLastTimeClick = eventTime
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_CLOSE, KeyEvent.KEYCODE_MEDIA_STOP -> {
-                            mediaPlayerHolder.stopPlaybackService(stopPlayback = true)
+                            mMediaPlayerHolder.stopPlaybackService(stopPlayback = true, fromUser = true, fromFocus = false)
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                            mediaPlayerHolder.skip(isNext = false)
+                            mMediaPlayerHolder.skip(isNext = false)
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                            mediaPlayerHolder.skip(isNext = true)
+                            mMediaPlayerHolder.skip(isNext = true)
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_REWIND -> {
-                            mediaPlayerHolder.repeatSong(0)
+                            mMediaPlayerHolder.repeatSong(0)
                             return true
                         }
                     }
                 }
             }
         } catch (e: Exception) {
-            R.string.error_media_buttons.toToast(this)
             e.printStackTrace()
             return false
         }

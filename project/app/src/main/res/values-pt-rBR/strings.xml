@@ -28,7 +28,8 @@
     <string name="error_bad_id">Toque uma música primeiro.</string>
     <string name="error_no_music">Adicione algumas músicas primeiro.</string>
     <string name="error_unknown_unsupported">Algo deu errado! :( Provavelmente o formato não é suportado, ou a pasta não está acessível (não é culpa do aplicativo!).</string>
-    <string name="error_media_buttons">Algo deu errado! :( Por favor, reinicie a reprodução do aplicativo.</string>
+    <string name="error_fs_not_allowed_sum">Erro! Desligue a otimização da bateria para o MPGO</string>
+    <string name="error_fs_not_allowed">Algo deu errado! :( Considere desativar a otimização da bateria nas configurações do sistema: Aplicativos &gt; Todos os aplicativos &gt; Music Player GO &gt; Bateria &gt; Irrestrito, pois isso pode fazer com que o serviço do media player pare.</string>
     <string name="on_close_activity">Parar a reprodução\?</string>
     <string name="repeat_enabled">Repetição única ligada.</string>
     <string name="repeat_loop_enabled">Repetir ∞.</string>
@@ -42,7 +43,6 @@
     <string name="theme_pref_auto_title">Sistema</string>
     <string name="accent_pref_title">Cor de destaque</string>
     <string name="active_fragments_pref_title">Abas ativas</string>
-    <string name="active_fragments_pref_warning">Você não pode simplesmente remover todas as abas! :P</string>
     <string name="sorting_pref_default">Padrão</string>
     <string name="precise_volume_pref_title">Controle preciso do volume</string>
     <string name="focus_pref_title">Gerenciamento de foco de áudio</string>
@@ -53,8 +53,6 @@
     <string name="sorting_pref_track">Pelo número da faixa ↓</string>
     <string name="sorting_pref_track_inv">Pelo número da faixa ↑</string>
     <string name="error_not_ready">Não foi possível carregar a biblioteca de música! :( Desmontar o cartão SD reconstrói o banco de dados Android MediaStore. Tente novamente mais tarde.</string>
-    <string name="eq_pref_note_summary">Nota: O equalizador do sistema é usado, a menos que seja desligado nas configurações do sistema. :)</string>
-    <string name="error_eq">Erro</string>
     <string name="error_list_ended">A lista terminou.</string>
     <string name="equalizer_v">Som surround</string>
     <string name="equalizer_bb">Aumento dos graves</string>
@@ -91,8 +89,6 @@
     <string name="delete">Excluir</string>
     <string name="pause_on_end">Pausar ao terminar ligado.</string>
     <string name="pause_on_end_disabled">Pausar ao terminar desligado.</string>
-    <string name="error_fs_not_allowed_sum">Erro! Desligue a otimização da bateria para o MPGO</string>
-    <string name="error_fs_not_allowed">Algo deu errado! :( Considere desativar a otimização da bateria nas configurações do sistema: Aplicativos &gt; Todos os aplicativos &gt; Music Player GO &gt; Bateria &gt; Irrestrito, pois isso pode fazer com que o serviço do media player pare.</string>
     <string name="equalizer_presets">Predefinições</string>
     <string name="locale_basque">Basco</string>
     <string name="locale_belarusian">Bielorrusso</string>
@@ -168,4 +164,21 @@
     <string name="filters_clear">Os filtros serão limpos. Continuar\?</string>
     <string name="confirm_ask_pref_title">Mensagens de confirmação</string>
     <string name="confirm_ask_pref_sum">Peça confirmação antes de fazer qualquer coisa</string>
+    <string name="filters_error">Não foi possível abrir artistas/pastas/álbuns ocultos.</string>
+    <string name="locale_malayalam">Malaiala</string>
+    <string name="locale_azerbaijani">Azerbaijano</string>
+    <string name="eq_pref_title">Equalizador integrado</string>
+    <string name="sorting_pref_reset_sum">Aplica-se a álbuns e pastas</string>
+    <string name="rotation_pref_title">Bloquear rotação</string>
+    <string name="sorting_pref_reset_neutral">Parar de perguntar</string>
+    <string name="category_ui">UI</string>
+    <string name="category_audio">Áudio</string>
+    <string name="eq_pref_sum">Forçar o uso do equalizador integrado</string>
+    <string name="locale_finnish">Finlandês</string>
+    <string name="sorting_pref_save">Definir como ordenação padrão\?</string>
+    <string name="sorting_pref_reset">Redefinir ordenação de faixas</string>
+    <string name="sorting_pref_reset_confirm">Redefinir as preferências de ordenação\?</string>
+    <string name="error_builtin_eq">Um erro ocorreu! Use o equalizador do sistema (se existir)!</string>
+    <string name="error_sys_eq">Equalizador do sistema não disponível!</string>
+    <string name="locale_punjabi">Punjabi</string>
 </resources>

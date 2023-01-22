@@ -28,7 +28,8 @@
     <string name="error_bad_id">Önce bir şarkı çal.</string>
     <string name="error_no_music">Önce biraz müzik ekleyin.</string>
     <string name="error_unknown_unsupported">Bir şeyler yanlış gitti! :( Muhtemelen biçim desteklenmiyor veya klasöre erişilemiyor (uygulamanın hatası değil!).</string>
-    <string name="error_media_buttons">Bir şeyler yanlış gitti! :( Lütfen uygulamadan oynatmayı yeniden başlatın.</string>
+    <string name="error_fs_not_allowed">Bir şeyler ters gitti! :( Sistem ayarlarından pil optimizasyonunu kapatmayı deneyin: Uygulamalar &gt; Tüm uygulamalar &gt; Müzik Çalar GO &gt; Pil &gt; Kısıtlanmamış, medya oynatıcı hizmetinin durmasına neden olabilir.</string>
+    <string name="error_fs_not_allowed_sum">Hata! MPGO için pil optimizasyonunu kapatın</string>
     <string name="on_close_activity">Oynatma durdurulsun mu\?</string>
     <string name="settings">Ayarlar</string>
     <string name="category_general">Genel</string>
@@ -39,7 +40,6 @@
     <string name="theme_pref_auto_title">Sistem</string>
     <string name="accent_pref_title">Ana Renk</string>
     <string name="active_fragments_pref_title">Aktif sekmeler</string>
-    <string name="active_fragments_pref_warning">Bütün sekmeleri kaldıramazsınız! : P</string>
     <string name="sorting_pref_default">Varsayılan</string>
     <string name="precise_volume_pref_title">Hassas ses denetimi</string>
     <string name="focus_pref_title">Ses odak yönetimi</string>
@@ -53,9 +53,7 @@
     <string name="sorting_pref_track">Şarkı numarasına göre ↓</string>
     <string name="sorting_pref_track_inv">Şarkı numarasına göre ↑</string>
     <string name="error_not_ready">Müzik kütüphanesi yüklenemedi! :( SD kartın bağlantısını kesmek, Android MediaStore veri tabanını yeniden oluşturur. Daha sonra tekrar deneyin.</string>
-    <string name="eq_pref_note_summary">Not: Sistem ayarlarından kapatılmadığı sürece sistem dengeleyicisi kullanılır. :)</string>
     <string name="on_list_ended_pref_title">Bir liste sona erdiğinde…</string>
-    <string name="error_eq">Hata</string>
     <string name="notification_actions_repeat">Ek bildirim eylemleri</string>
     <string name="fast_seeking_pref_summary">Hızlı ileri/geri sarma adımı (saniye)</string>
     <string name="fast_seeking_pref_title">Hızlı arama</string>
@@ -101,8 +99,6 @@
     <string name="locale_kurdish">Kürtçe</string>
     <string name="locale_russian">Rusça</string>
     <string name="pink">Pembe</string>
-    <string name="error_fs_not_allowed">Bir şeyler ters gitti! :( Sistem ayarlarından pil optimizasyonunu kapatmayı deneyin: Uygulamalar &gt; Tüm uygulamalar &gt; Müzik Çalar GO &gt; Pil &gt; Kısıtlanmamış, medya oynatıcı hizmetinin durmasına neden olabilir.</string>
-    <string name="error_fs_not_allowed_sum">Hata! MPGO için pil optimizasyonunu kapatın</string>
     <string name="locale_arabic">Arapça</string>
     <string name="locale_norwegian_n">Norveççe (Nynorsk)</string>
     <string name="locale_persian">Farsça</string>
@@ -159,4 +155,15 @@
     <string name="locale_pref_title">Dil</string>
     <string name="locale_spanish">İspanyolca</string>
     <string name="sleeptimer_enabled">Oynatmayı %1s sonra durdur</string>
+    <string name="filters_error">Hata! Gizli sanatçılar/klasörler/albümler açılamıyor!</string>
+    <string name="notification_actions_pref_title">Ek bildirim eylemleri</string>
+    <string name="notification_actions_favorite">Favorilere ekle/kapat</string>
+    <string name="notification_actions_favorite_position">Favorilere ekle (pozisyonla)/kapat</string>
+    <string name="notification_actions_fast_seeking">Hızlı arama</string>
+    <string name="continue_on_end_desc">Tamamlandığında devam etsin ya da tekrar çalsın</string>
+    <string name="pause_on_end_disabled">Tamamlandığında devam et.</string>
+    <string name="filters_clear">Filtereler temizlenecek.
+\nDevam edilsin mi\?</string>
+    <string name="confirm_ask_pref_title">Onay mesajları</string>
+    <string name="confirm_ask_pref_sum">Bir şey yapmadan önce onay için sor</string>
 </resources>
